@@ -1,2 +1,0 @@
-#!/bin/bash
-bin/start_RNAseq_pipeline.3.0.pl -species 'Homo sapiens' -genome /src/testdata/H.sapiens.genome.hg19.test.fa -annotation /src/testdata/H.sapiens.EnsEMBL.55.test.gtf -project Test -experiment TestRun -template /src/pipeline/template3.0.txt -readlength 76 -cellline 'NHEK' -rnafrac LONGPOLYA -compartment CELL -threads 2 -qualities solexa -database TestRNAseqPipeline -commondb TestRNAseqPipelineCommon -mapper GEM -mismatches 2 -clean
