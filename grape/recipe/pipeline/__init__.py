@@ -2,6 +2,7 @@
 """
 Buildout recipe grape.recipe.pipeline
 """
+import os
 from grape.recipe.pipeline import prepare
 
 
@@ -17,12 +18,19 @@ class Recipe(object):
         self.buildout = buildout
         self.name = name
         self.options = options
+        location = os.path.join(buildout['buildout']['parts-directory'], name)
+        options['location'] = location
 
     def install(self):
         """
         Prepare the pipeline.
         """
-        return prepare.main(self.options, self.buildout)
+        # Create directory
+        dest = self.options['location']
+        if not os.path.exists(dest):
+            os.mkdir(dest)
+        prepare.main(self.options, self.buildout)
+        return dest
 
     def update(self):
         """
