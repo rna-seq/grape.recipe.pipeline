@@ -4,18 +4,53 @@ Test for prepare.py
 
 import os
 import unittest
+import shutil
 from pkg_resources import get_provider
 
 from grape.recipe.pipeline.prepare import main
 
 PROVIDER = get_provider('grape.recipe.pipeline')
-BUILDOUT = PROVIDER.get_resource_filename("", 'tests/buildout')
+SANDBOX = PROVIDER.get_resource_filename("", 'tests/sandbox/')
+BUILDOUT = os.path.join(SANDBOX, 'buildout')
 
 
 class MainTests(unittest.TestCase):
     """
     Test the main method in prepare.py
     """
+
+    def setUp(self):
+        shutil.rmtree(BUILDOUT, ignore_errors=True)
+        os.mkdir(BUILDOUT)
+        os.mkdir(os.path.join(BUILDOUT, 'bin'))
+        os.mkdir(os.path.join(BUILDOUT, 'parts'))
+        os.mkdir(os.path.join(BUILDOUT, 'parts/TestRun'))
+        os.mkdir(os.path.join(BUILDOUT, 'src'))
+        os.mkdir(os.path.join(BUILDOUT, 'src/flux'))
+        os.mkdir(os.path.join(BUILDOUT, 'src/flux/bin'))
+        path = open(os.path.join(BUILDOUT, 'src/flux/bin/flux.sh'), 'w')
+        path.close()
+        os.mkdir(os.path.join(BUILDOUT, 'src/gem'))
+        os.mkdir(os.path.join(BUILDOUT, 'src/overlap'))
+        path = open(os.path.join(BUILDOUT, 'src/overlap/overlap'), 'w')
+        path.close()
+        os.mkdir(os.path.join(BUILDOUT, 'src/pipeline'))
+        os.mkdir(os.path.join(BUILDOUT, 'src/pipeline/bin'))
+        os.mkdir(os.path.join(BUILDOUT, 'src/pipeline/lib'))
+        os.mkdir(os.path.join(BUILDOUT, 'src/testdata'))
+        path = open(os.path.join(BUILDOUT,
+                                 'src/testdata/testA.r1.fastq.gz'), 'w')
+        path.close()
+        path = open(os.path.join(BUILDOUT,
+                                 'src/testdata/testA.r2.fastq.gz'), 'w')
+        path.close()
+        path = open(os.path.join(BUILDOUT,
+                                 'src/testdata/testB.r1.fastq.gz'), 'w')
+        path.close()
+        path = open(os.path.join(BUILDOUT,
+                                 'src/testdata/testB.r2.fastq.gz'), 'w')
+        path.close()
+        os.mkdir(os.path.join(BUILDOUT, 'var'))
 
     def test_main(self):
         """
