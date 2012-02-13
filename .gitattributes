@@ -5,4 +5,5 @@ grape/recipe/pipeline/__init__.py -text
 grape/recipe/pipeline/prepare.py -text
 grape/recipe/pipeline/tests/README.txt -text
 grape/recipe/pipeline/tests/__init__.py -text
+grape/recipe/pipeline/tests/test_prepare.py -text
 /setup.py -text
