@@ -42,7 +42,6 @@ class InstallationState:
 
     def set_reinstall(self, path):
         """Call when the path has been reinstalled"""
-        print "set_reinstall", path
         self.state[path] = True
 
     def get_reinstall(self, path):
