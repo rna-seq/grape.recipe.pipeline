@@ -1,0 +1,4 @@
+testA.r2.fastq	testA	testA.2	Test
+testA.r1.fastq	testA	testA.1	Test
+testB.r2.fastq	testB	testB.2	Test
+testB.r1.fastq	testB	testB.1	Test
