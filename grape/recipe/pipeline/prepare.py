@@ -428,6 +428,8 @@ def install_pipeline_scripts(options, buildout, accession):
     target = os.path.join(options['location'], 'execute.sh')
     execute_file = open(target, 'w')
     execute_file.write(command)
+    execute_file.close()
+    os.chmod(target, 0755)
 
 
 def main(options, buildout):
