@@ -1,0 +1,10 @@
+/*.pyc
+/*.pyo
+grape/*.pyc
+grape/*.pyo
+grape/recipe/*.pyc
+grape/recipe/*.pyo
+grape/recipe/pipeline/*.pyc
+grape/recipe/pipeline/*.pyo
+grape/recipe/pipeline/tests/*.pyc
+grape/recipe/pipeline/tests/*.pyo
