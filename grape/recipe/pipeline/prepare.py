@@ -288,6 +288,11 @@ def install_dependencies(buildout, bin_folder):
     # Remove any existing flux.sh in the pipeline bin folder
     buildout_directory = buildout['buildout']['directory']
     flux_sh = os.path.join(buildout_directory, 'var/pipeline/bin/flux.sh')
+    if INSTALLATION_STATE.get_reinstall(flux_sh):
+        # If the flux has been installed, then the dependencies are installed
+        # already.
+        return
+
     if os.path.exists(flux_sh):
         os.remove(flux_sh)
     if os.path.exists(flux_sh):
@@ -322,6 +327,10 @@ def install_dependencies(buildout, bin_folder):
         os.symlink(source, target)
         if not os.path.exists(target):
             raise AttributeError("Gem binary not found: %s" % target)
+
+    if INSTALLATION_STATE.set_reinstall(flux_sh):
+        # Dependencies are installed, set flux.sh as representative
+        return
 
 
 def parse_read_length(accession):
