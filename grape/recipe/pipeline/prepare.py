@@ -46,7 +46,7 @@ class InstallationState:
 
     def get_reinstall(self, path):
         """Call when you need to know whether the path has been reinstalled."""
-        return self.state.get(path, True)
+        return self.state.get(path, False)
 
 INSTALLATION_STATE = InstallationState()
 
@@ -98,7 +98,7 @@ def install_bin_folder(options, buildout, bin_folder):
     version defined in buildout.cfg
     """
     # Start with a fresh installation once
-    if INSTALLATION_STATE.get_reinstall(bin_folder):
+    if not INSTALLATION_STATE.get_reinstall(bin_folder):
         shutil.rmtree(bin_folder, ignore_errors=True)
         # The original code comes from the SVN
         buildout_directory = buildout['buildout']['directory']
@@ -115,7 +115,7 @@ def install_bin_folder(options, buildout, bin_folder):
     # part
     os.symlink(bin_folder, target)
 
-    if INSTALLATION_STATE.get_reinstall(bin_folder):
+    if not INSTALLATION_STATE.get_reinstall(bin_folder):
         # Use the same shebang for all perl scripts
         perlscripts = os.path.join(bin_folder, '*.pl')
         for perlscript in glob.glob(perlscripts):
@@ -140,7 +140,6 @@ def install_bin_folder(options, buildout, bin_folder):
             perl_file.write(content)
             perl_file.close()
 
-
 def install_lib_folder(options, buildout, lib_folder):
     """
     The lib folder from src/pipeline/lib is copied to var/pipeline/lib
@@ -149,13 +148,14 @@ def install_lib_folder(options, buildout, lib_folder):
     buildout_directory = buildout['buildout']['directory']
     # Remove the old lib folder in var/pipeline
 
-    if INSTALLATION_STATE.get_reinstall(lib_folder):
+    if not INSTALLATION_STATE.get_reinstall(lib_folder):
         shutil.rmtree(lib_folder, ignore_errors=True)
         # The original lib folder is taken from the SVN
         svn_folder = 'src/pipeline/lib'
         pipeline_lib_folder = os.path.join(buildout_directory, svn_folder)
         # Copy the lib folder over to var/pipeline
         shutil.copytree(pipeline_lib_folder, lib_folder)
+
 
     # Make a symbolic link in the part to the lib folder in var/pipeline
     target = os.path.join(options['location'], 'lib')
@@ -291,6 +291,7 @@ def install_dependencies(buildout, bin_folder):
     if INSTALLATION_STATE.get_reinstall(flux_sh):
         # If the flux has been installed, then the dependencies are installed
         # already.
+        print "-> Not reinstall"
         return
 
     if os.path.exists(flux_sh):
@@ -502,7 +503,7 @@ def main(options, buildout):
 
     install_read_folder(options, accession)
 
-    if INSTALLATION_STATE.get_reinstall(bin_folder):
+    if not INSTALLATION_STATE.get_reinstall(bin_folder):
         install_dependencies(buildout, bin_folder)
 
     install_pipeline_scripts(options, buildout, accession)
