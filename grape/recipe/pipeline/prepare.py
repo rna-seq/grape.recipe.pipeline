@@ -1,16 +1,10 @@
 """
-This module is used by buildout by applying the z3c.recipe.runscript recipe
-when building the RNASeq pipeline parts:
+This module is used by buildout when building the RNASeq pipeline parts:
 
     [shortRNA001C]
-    recipe = z3c.recipe.runscript
-    update-script = prepare.py:main
-    install-script = prepare.py:main
+    recipe = grape.recipe.pipeline
     accession = shortRNA001C
-    pipeline = female
-
-Both the update-script and install-script point to the prepare.py module and
-its "main" method.
+    pipeline = male
 
 The accession attribute is necessary so that the corresponding files and
 metadata for the pipeline run can be found in the accession database.
