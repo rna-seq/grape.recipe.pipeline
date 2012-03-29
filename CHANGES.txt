@@ -1,10 +1,13 @@
 Next release
 ============
 
+1.1 (2012-03-29)
+================
+
 Features
 --------
 
-- Detects the quick runs for predefined species, and prepares the pipeline.
+- Quick run mode for running one set of reads for predefined species.
 
 1.0 (2012-03-22)
 ================
