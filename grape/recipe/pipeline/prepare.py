@@ -440,7 +440,59 @@ def quick(options, buildout):
     This is the recipe for running the pipeline quickly without specifying
     any meta data, for a given species.
     """
-    print "Quick setup"
+    options = {'accession':'Run',
+               'location':options['location'],
+               }
+    fastqs = glob.glob("*.fastq.gz")
+    if len(fastqs) == 0:
+        raise AttributeError("Please drop *.fastq.gz files into this folder")
+
+    gtfs = glob.glob("*.gtf")
+    if len(gtfs) != 1:
+        raise AttributeError("Please provide just one genome file. Found: %s" % gtfs)
+
+    fas = glob.glob("*.fa")
+    if len(gtfs) != 1:
+        raise AttributeError("Please provide just one annotation file. Found: %s" % fas)
+
+    species = None
+    if "gencode.v7.annotation.ok.gtf" in gtfs and "H.sapiens.genome.hg19.main.fa" in fas:
+        species = "Homo sapiens"
+    elif "mm9_ucsc_UCSC_genes.gtf" in gtfs and "M.musculus.genome.mm9.main.fa" in fas:
+        species = "Mus musculus"
+    elif "flyBase.exons.genes_real.transcripts.gtf" in gtfs and "D.melanogaster.genome.fa" in fas:
+        species = "Drosophila Melanogaster"
+
+    if species is None:
+        raise AttributeError("Genome and annotation files don't match: %s %s" %(gtfs, fas))
+
+    buildout_directory = buildout['buildout']['directory']
+    
+    accession = {'file_location':'\n'.join(fastqs),
+                 'species': species,
+                 'readType': 'Unknown',
+                 'cell': 'Unknown',
+                 'rnaExtract': 'Unknown',
+                 'localization': 'Unknown',
+                 'qualities': 'phred',
+                 }
+    pipeline = {'GENOMESEQ':gtfs[0],
+                'ANNOTATION':fas[0],
+                'PROJECTID':'Quick',
+                'TEMPLATE': os.path.join(buildout_directory, '/src/pipeline/template3.0.txt'),
+                'THREADS': 1,
+                'DB': 'Quick_RNAseqPipeline',
+                'COMMONDB': 'Quick_RNAseqPipelineCommon',
+                'MAPPER': 'GEM',
+                'MISMATCHES': '2',
+                }
+    buildout = {'Run': accession, 
+                'buildout':{'directory': buildout_directory},
+                'settings': buildout['settings'].copy(),
+                'pipeline':pipeline
+                }
+    main(options, buildout)
+
 
 def main(options, buildout):
     """
@@ -468,7 +520,7 @@ def main(options, buildout):
     try:
         accession = buildout[options['accession']]
     except KeyError:
-        if buildout['runs']['parts'] in ['QCE1', 'QHS1', 'QMM1', 'QCE1']:
+        if buildout['runs']['parts'] in ['Run']:
             quick(options, buildout)
             return
         print "Accession not found", options['accession']
