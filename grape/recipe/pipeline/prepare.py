@@ -483,7 +483,7 @@ def quick(options, buildout):
     pipeline = {'GENOMESEQ':gtfs[0],
                 'ANNOTATION':fas[0],
                 'PROJECTID':'Quick',
-                'TEMPLATE': os.path.join(buildout_directory, '/src/pipeline/template3.0.txt'),
+                'TEMPLATE': os.path.join(buildout_directory, 'src/pipeline/template3.0.txt'),
                 'THREADS': 1,
                 'DB': 'Quick_RNAseqPipeline',
                 'COMMONDB': 'Quick_RNAseqPipelineCommon',
