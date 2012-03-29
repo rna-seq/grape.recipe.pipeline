@@ -435,6 +435,12 @@ def install_pipeline_scripts(options, buildout, accession):
     execute_file.close()
     os.chmod(target, 0755)
 
+def quick(options, buildout):
+    """
+    This is the recipe for running the pipeline quickly without specifying
+    any meta data, for a given species.
+    """
+    print "Quick setup"
 
 def main(options, buildout):
     """
@@ -462,6 +468,9 @@ def main(options, buildout):
     try:
         accession = buildout[options['accession']]
     except KeyError:
+        if buildout['runs']['parts'] in ['QCE1', 'QHS1', 'QMM1', 'QCE1']:
+            quick(options, buildout)
+            return
         print "Accession not found", options['accession']
         return
 
