@@ -1,0 +1,12 @@
+Next release
+============
+
+Features
+--------
+
+- Detects the quick runs for predefined species, and prepares the pipeline.
+
+1.0 (2012-03-22)
+================
+
+- First release
