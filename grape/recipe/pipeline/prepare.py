@@ -470,11 +470,15 @@ def quick(options, buildout):
     
     accession = {'file_location':'\n'.join(fastqs),
                  'species': species,
-                 'readType': 'Unknown',
+                 'readType': '76',
                  'cell': 'Unknown',
                  'rnaExtract': 'Unknown',
                  'localization': 'Unknown',
                  'qualities': 'phred',
+                 'pair_id':'',
+                 'mate_id':'',
+                 'label':'',
+                 
                  }
     pipeline = {'GENOMESEQ':gtfs[0],
                 'ANNOTATION':fas[0],
