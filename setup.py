@@ -4,7 +4,7 @@ grape.recipe.pipeline
 """
 from setuptools import setup, find_packages
 
-version = '1.0'
+version = '1.1.1'
 
 long_description = ''
 entry_point = 'grape.recipe.pipeline:Recipe'
