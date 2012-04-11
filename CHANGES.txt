@@ -1,6 +1,17 @@
 Next release
 ============
 
+1.1.1 (2012-04-11)
+==================
+
+Bug Fixes
+---------
+
+- Raise an error when the pair_id, mate_id, and label attributes of accessions
+  are not specified
+
+- Raise an error when a fastq file given in an accession file is not gzipped
+
 1.1 (2012-03-29)
 ================
 

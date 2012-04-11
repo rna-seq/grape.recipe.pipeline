@@ -240,31 +240,46 @@ def install_read_list(options, buildout, accession):
         if 'pair_id' in accession:
             pair_id = accession['pair_id'].split('\n')[number]
         else:
-            pair_id = buildout['labeling']['pair_id'].strip()
-            if pair_id.startswith("python:"):
-                pair_id = run_python(pair_id[7:], accession)
+            if 'labeling' in buildout:
+                pair_id = buildout['labeling']['pair_id'].strip()
+                if pair_id.startswith("python:"):
+                    pair_id = run_python(pair_id[7:], accession)
+            else:
+                message = "Specify a pair_id attribute for accession %s"
+                raise AttributeError(message % accession['accession'])
 
         if 'mate_id' in accession:
             mate_id = accession['mate_id'].split('\n')[number]
         else:
-            mate_id = buildout['labeling']['mate_id'].strip()
-            if mate_id.startswith("python:"):
-                # The mate id gets a postfix of ".1" and ".2"
-                mate_id = run_python(mate_id[7:], accession).strip()
-                if number_of_reads > 1:
-                    # In the absence of the file type, just number in order
-                    mate_id = "%s.%s" % (mate_id, number + 1)
+            if 'labeling' in buildout:
+                mate_id = buildout['labeling']['mate_id'].strip()
+                if mate_id.startswith("python:"):
+                    # The mate id gets a postfix of ".1" and ".2"
+                    mate_id = run_python(mate_id[7:], accession).strip()
+                    if number_of_reads > 1:
+                        # In the absence of the file type, just number in order
+                        mate_id = "%s.%s" % (mate_id, number + 1)
+            else:
+                message = "Specify a mate_id attribute for accession %s"
+                raise AttributeError(message % accession['accession'])
 
         if 'label' in accession:
             label = accession['label'].split('\n')[number]
         else:
-            label = buildout['labeling']['label'].strip()
-            if label.startswith("python:"):
-                label = run_python(label[7:], accession)
+            if 'labeling' in buildout:
+                label = buildout['labeling']['label'].strip()
+                if label.startswith("python:"):
+                    label = run_python(label[7:], accession)
+            else:
+                message = "Specify a label attribute for accession %s"
+                raise AttributeError(message % accession['accession'])
 
         file_name = os.path.split(file_location.strip())[1]
         if file_name.split('.')[-1] == "gz":
             file_name = file_name[:-3]
+        else:
+            message = "Expecting .fastq file to be gzipped: %s"
+            raise AttributeError(message % file_location)
         labels = (file_name.strip(),
                   pair_id.strip().replace(' ', ''),
                   mate_id.strip().replace(' ', ''),
