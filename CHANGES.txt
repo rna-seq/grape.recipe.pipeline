@@ -1,6 +1,12 @@
 Next release
 ============
 
+1.1.2 (2012-04-12)
+==================
+
+- Raise an error when files and label/mate_id/pair_id don't have the 
+  same length
+
 1.1.1 (2012-04-11)
 ==================
 

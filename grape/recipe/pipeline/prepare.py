@@ -239,6 +239,10 @@ def install_read_list(options, buildout, accession):
         file_location = accession['file_location'].split('\n')[number]
         if 'pair_id' in accession:
             pair_id = accession['pair_id'].split('\n')[number]
+            if len(accession['pair_id'].split('\n')) != number_of_reads:
+                message = ["pair_id needs to have exactly one line for each ",
+                           "file defined in file_locations in accession %s"]
+                raise AttributeError("".join(message) % accession['accession'])
         else:
             if 'labeling' in buildout:
                 pair_id = buildout['labeling']['pair_id'].strip()
@@ -250,6 +254,10 @@ def install_read_list(options, buildout, accession):
 
         if 'mate_id' in accession:
             mate_id = accession['mate_id'].split('\n')[number]
+            if len(accession['mate_id'].split('\n')) != number_of_reads:
+                message = ["mate_id needs to have exactly one line for each ",
+                           "file defined in file_locations in accession %s"]
+                raise AttributeError("".join(message) % accession['accession'])
         else:
             if 'labeling' in buildout:
                 mate_id = buildout['labeling']['mate_id'].strip()
@@ -265,6 +273,10 @@ def install_read_list(options, buildout, accession):
 
         if 'label' in accession:
             label = accession['label'].split('\n')[number]
+            if len(accession['label'].split('\n')) != number_of_reads:
+                message = ["label needs to have exactly one line for each ",
+                           "file defined in file_locations in accession %s"]
+                raise AttributeError("".join(message) % accession['accession'])
         else:
             if 'labeling' in buildout:
                 label = buildout['labeling']['label'].strip()
