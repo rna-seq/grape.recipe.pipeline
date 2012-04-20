@@ -134,6 +134,7 @@ def install_bin_folder(options, buildout, bin_folder):
             perl_file.write(content)
             perl_file.close()
 
+
 def install_lib_folder(options, buildout, lib_folder):
     """
     The lib folder from src/pipeline/lib is copied to var/pipeline/lib
@@ -149,7 +150,6 @@ def install_lib_folder(options, buildout, lib_folder):
         pipeline_lib_folder = os.path.join(buildout_directory, svn_folder)
         # Copy the lib folder over to var/pipeline
         shutil.copytree(pipeline_lib_folder, lib_folder)
-
 
     # Make a symbolic link in the part to the lib folder in var/pipeline
     target = os.path.join(options['location'], 'lib')
@@ -464,13 +464,14 @@ def install_pipeline_scripts(options, buildout, accession):
     execute_file.close()
     os.chmod(target, 0755)
 
+
 def quick(options, buildout):
     """
     This is the recipe for running the pipeline quickly without specifying
     any meta data, for a given species.
     """
-    options = {'accession':'Run',
-               'location':options['location'],
+    options = {'accession': 'Run',
+               'location': options['location'],
                }
     fastqs = glob.glob("*.fastq.gz")
     if len(fastqs) == 0:
@@ -478,49 +479,57 @@ def quick(options, buildout):
 
     gtfs = glob.glob("*.gtf")
     if len(gtfs) != 1:
-        raise AttributeError("Please provide just one genome file. Found: %s" % gtfs)
+        template = "Please provide just one genome file. Found: %s"
+        raise AttributeError(template % gtfs)
 
     fas = glob.glob("*.fa")
     if len(gtfs) != 1:
-        raise AttributeError("Please provide just one annotation file. Found: %s" % fas)
+        template = "Please provide just one annotation file. Found: %s"
+        raise AttributeError(template % fas)
 
     species = None
-    if "gencode.v7.annotation.ok.gtf" in gtfs and "H.sapiens.genome.hg19.main.fa" in fas:
-        species = "Homo sapiens"
-    elif "mm9_ucsc_UCSC_genes.gtf" in gtfs and "M.musculus.genome.mm9.main.fa" in fas:
-        species = "Mus musculus"
-    elif "flyBase.exons.genes_real.transcripts.gtf" in gtfs and "D.melanogaster.genome.fa" in fas:
-        species = "Drosophila Melanogaster"
+    if "gencode.v7.annotation.ok.gtf" in gtfs:
+        if "H.sapiens.genome.hg19.main.fa" in fas:
+            species = "Homo sapiens"
+    elif "mm9_ucsc_UCSC_genes.gtf" in gtfs:
+        if "M.musculus.genome.mm9.main.fa" in fas:
+            species = "Mus musculus"
+    elif "flyBase.exons.genes_real.transcripts.gtf" in gtfs:
+        if "D.melanogaster.genome.fa" in fas:
+            species = "Drosophila Melanogaster"
 
     if species is None:
-        raise AttributeError("Genome and annotation files don't match: %s %s" %(gtfs, fas))
+        template = "Genome and annotation files don't match: %s %s"
+        raise AttributeError(template % (gtfs, fas))
 
     buildout_directory = buildout['buildout']['directory']
-    
-    accession = {'file_location':'\n'.join(fastqs),
+
+    accession = {'file_location': '\n'.join(fastqs),
                  'species': species,
                  'readType': '76',
                  'cell': 'Unknown',
                  'rnaExtract': 'Unknown',
                  'localization': 'Unknown',
                  'qualities': 'phred',
-                 'pair_id':'',
-                 'mate_id':'',
-                 'label':'',
-                 
+                 'pair_id': '',
+                 'mate_id': '',
+                 'label': '',
                  }
-    pipeline = {'GENOMESEQ':gtfs[0],
-                'ANNOTATION':fas[0],
-                'PROJECTID':'Quick',
-                'TEMPLATE': os.path.join(buildout_directory, 'src/pipeline/template3.0.txt'),
+
+    template = os.path.join(buildout_directory, 'src/pipeline/template3.0.txt')
+
+    pipeline = {'GENOMESEQ': gtfs[0],
+                'ANNOTATION': fas[0],
+                'PROJECTID': 'Quick',
+                'TEMPLATE': template,
                 'THREADS': 1,
                 'DB': 'Quick_RNAseqPipeline',
                 'COMMONDB': 'Quick_RNAseqPipelineCommon',
                 'MAPPER': 'GEM',
                 'MISMATCHES': '2',
                 }
-    buildout = {'Run': accession, 
-                'buildout':{'directory': buildout_directory},
+    buildout = {'Run': accession,
+                'buildout': {'directory': buildout_directory},
                 'settings': buildout['settings'].copy(),
                 'pipeline':pipeline
                 }
