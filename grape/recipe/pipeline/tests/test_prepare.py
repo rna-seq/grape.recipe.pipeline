@@ -78,7 +78,7 @@ class MainTests(unittest.TestCase):
                 'qualities': 'solexa',
                 'pair_id': 'testA\ntestA\ntestB\ntestB',
                 'mate_id': 'testA.2\ntestA.1\ntestB.2\ntestB.1',
-                'label': 'Test\nTest\nTest\nTest\n',
+                'label': 'Test\nTest\nTest\nTest',
                },
             'pipeline': {
                  'TEMPLATE': os.path.join(
