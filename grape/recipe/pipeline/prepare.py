@@ -276,7 +276,7 @@ def install_read_list(options, buildout, accession):
             if len(accession['label'].split('\n')) != number_of_reads:
                 message = ["label needs to have exactly one line for each ",
                            "file defined in file_locations in accession %s"]
-                raise AttributeError("".join(message) % accession['accession'])
+                raise AttributeError("".join(message) % options['accession'])
         else:
             if 'labeling' in buildout:
                 label = buildout['labeling']['label'].strip()
@@ -284,7 +284,7 @@ def install_read_list(options, buildout, accession):
                     label = run_python(label[7:], accession)
             else:
                 message = "Specify a label attribute for accession %s"
-                raise AttributeError(message % accession['accession'])
+                raise AttributeError(message % options['accession'])
 
         file_name = os.path.split(file_location.strip())[1]
         if file_name.split('.')[-1] == "bam":
