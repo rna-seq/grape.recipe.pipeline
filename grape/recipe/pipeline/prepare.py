@@ -287,7 +287,9 @@ def install_read_list(options, buildout, accession):
                 raise AttributeError(message % accession['accession'])
 
         file_name = os.path.split(file_location.strip())[1]
-        if file_name.split('.')[-1] == "gz":
+        if file_name.split('.')[-1] == "bam":
+            pass
+        elif file_name.split('.')[-1] == "gz":
             file_name = file_name[:-3]
         else:
             message = "Expecting .fastq file to be gzipped: %s"
