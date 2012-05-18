@@ -1,6 +1,12 @@
 Next release
 ============
 
+1.1.4 (2012-05-18)
+==================
+
+- New installation routine for the new Flux version now using the flux binary
+  instead of a flux.sh
+
 1.1.3 (2012-04-20)
 ==================
 
