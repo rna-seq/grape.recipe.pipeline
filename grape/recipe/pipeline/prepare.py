@@ -322,11 +322,11 @@ def install_dependencies(buildout, bin_folder):
     if os.path.exists(flux):
         raise AttributeError
 
-    # The flux.sh gets install inside the var/pipeline/bin folder
+    # The flux gets install inside the var/pipeline/bin folder
     pipeline_bin = os.path.join(buildout_directory, 'src/flux/bin')
     os.symlink(os.path.join(pipeline_bin, 'flux'), flux)
-    if not os.path.exists(flux_sh):
-        raise AttributeError("Flux shell script not found", flux_sh)
+    if not os.path.exists(flux):
+        raise AttributeError("Flux shell script not found", flux)
 
     # Make symbolic links to overlap
     target = os.path.join(bin_folder, 'overlap')
@@ -343,8 +343,8 @@ def install_dependencies(buildout, bin_folder):
         if not os.path.exists(target):
             raise AttributeError("Gem binary not found: %s" % target)
 
-    if INSTALLATION_STATE.set_reinstall(flux_sh):
-        # Dependencies are installed, set flux.sh as representative
+    if INSTALLATION_STATE.set_reinstall(flux):
+        # Dependencies are installed, set flux as representative
         return
 
 
