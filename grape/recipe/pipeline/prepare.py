@@ -308,36 +308,27 @@ def install_dependencies(buildout, bin_folder):
     Install the flux, overlap and gem binaries.
     """
 
-    # Remove any existing flux.sh in the pipeline bin folder
+    # Remove any existing flux in the pipeline bin folder
     buildout_directory = buildout['buildout']['directory']
-    flux_sh = os.path.join(buildout_directory, 'var/pipeline/bin/flux.sh')
-    if INSTALLATION_STATE.get_reinstall(flux_sh):
+    flux = os.path.join(buildout_directory, 'var/pipeline/bin/flux')
+    if INSTALLATION_STATE.get_reinstall(flux):
         # If the flux has been installed, then the dependencies are installed
         # already.
         print "-> Not reinstall"
         return
 
-    if os.path.exists(flux_sh):
-        os.remove(flux_sh)
-    if os.path.exists(flux_sh):
+    if os.path.exists(flux):
+        os.remove(flux)
+    if os.path.exists(flux):
         raise AttributeError
 
-    # Use the Java binary as defined in the buildout.cfg
-    java = os.path.join(buildout_directory, buildout['settings']['java'])
     # The flux.sh gets install inside the var/pipeline/bin folder
     pipeline_bin = os.path.join(buildout_directory, 'src/flux/bin')
-    # The jar file location is defined in the buildout.cfg
-    flux_jar = buildout['settings']['flux_jar']
-    # This is the command used to create the flux.sh shell script
-    template = '%s -DwrapperDir="%s" -jar "%s" --install'
-    command = template % (java, pipeline_bin, flux_jar)
-    # Now we can creat the flux.sh file.
-    call(command, shell=True)
-    os.symlink(os.path.join(pipeline_bin, 'flux.sh'), flux_sh)
+    os.symlink(os.path.join(pipeline_bin, 'flux'), flux)
     if not os.path.exists(flux_sh):
         raise AttributeError("Flux shell script not found", flux_sh)
 
-    # Make symbolic links to the overlap and flux tools
+    # Make symbolic links to overlap
     target = os.path.join(bin_folder, 'overlap')
     os.symlink(buildout['settings']['overlap'], target)
     if not os.path.exists(target):
