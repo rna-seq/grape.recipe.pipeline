@@ -28,7 +28,7 @@ class MainTests(unittest.TestCase):
         os.mkdir(os.path.join(BUILDOUT, 'src'))
         os.mkdir(os.path.join(BUILDOUT, 'src/flux'))
         os.mkdir(os.path.join(BUILDOUT, 'src/flux/bin'))
-        path = open(os.path.join(BUILDOUT, 'src/flux/bin/flux.sh'), 'w')
+        path = open(os.path.join(BUILDOUT, 'src/flux/bin/flux'), 'w')
         path.close()
         os.mkdir(os.path.join(BUILDOUT, 'src/gem'))
         os.mkdir(os.path.join(BUILDOUT, 'src/overlap'))
