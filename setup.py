@@ -4,7 +4,7 @@ grape.recipe.pipeline
 """
 from setuptools import setup, find_packages
 
-version = '1.1.3'
+version = '1.1.5'
 
 long_description = ''
 entry_point = 'grape.recipe.pipeline:Recipe'
@@ -40,7 +40,7 @@ setup(name='grape.recipe.pipeline',
       install_requires=['setuptools',
                         'zc.buildout',
                         # -*- Extra requirements: -*-
-                        'RestrictedPython',
+                        'RestrictedPython'i,
                         ],
       entry_points=entry_points,
       )
