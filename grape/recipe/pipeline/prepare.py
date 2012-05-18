@@ -15,7 +15,6 @@ The pipeline attribute specifies the section defining the pipeline options.
 import os
 import shutil
 import glob
-from subprocess import call
 from RestrictedPython import compile_restricted
 from RestrictedPython.Guards import safe_builtins
 from RestrictedPython.PrintCollector import PrintCollector
@@ -522,7 +521,7 @@ def quick(options, buildout):
     buildout = {'Run': accession,
                 'buildout': {'directory': buildout_directory},
                 'settings': buildout['settings'].copy(),
-                'pipeline':pipeline
+                'pipeline': pipeline
                 }
     main(options, buildout)
 
