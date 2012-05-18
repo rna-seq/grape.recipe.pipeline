@@ -1,8 +1,22 @@
 Next release
 ============
 
+1.1.5 (2012-05-18)
+==================
+
+Internal
+--------
+
+- Fix unit tests now that flux.sh is flux
+
+- Remove import of call from subprocess because the installation of the flux
+  does not need it any more
+
 1.1.4 (2012-05-18)
 ==================
+
+Features
+--------
 
 - New installation routine for the new Flux version now using the flux binary
   instead of a flux.sh
