@@ -40,7 +40,7 @@ setup(name='grape.recipe.pipeline',
       install_requires=['setuptools',
                         'zc.buildout',
                         # -*- Extra requirements: -*-
-                        'RestrictedPython'i,
+                        'RestrictedPython',
                         ],
       entry_points=entry_points,
       )
