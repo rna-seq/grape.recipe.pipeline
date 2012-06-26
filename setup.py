@@ -6,7 +6,8 @@ from setuptools import setup, find_packages
 
 version = '1.1.6'
 
-long_description = """Grape is a pipeline for processing and analyzing RNA-Seq data.
+long_description = """The grape.recipe.pipeline package is a Buildout recipe used for
+configuring Grape, a pipeline used for processing and analyzing RNA-Seq data.
 RNA-Seq is a next generation sequencing technology used to sequence cellular RNA.
 To run Grape, you need the read files in Fasta, FastQ or prealigned SAM/BAM formats,
 as well as a genome and a gene transcript annotation. First, Grape does the quality 
@@ -28,7 +29,7 @@ entry_points = {"zc.buildout": [
 
 setup(name='grape.recipe.pipeline',
       version=version,
-      description="Grape is a pipeline for processing and analyzing RNA-Seq data",
+      description="A Buildout recipe used for configuring the Grape RNA-Seq pipeline",
       long_description=long_description,
       # Get more strings from http://www.python.org/pypi?%3Aaction=list_classifiers
       classifiers=[
