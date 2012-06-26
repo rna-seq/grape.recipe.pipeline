@@ -8,6 +8,25 @@ Configure a Grape pipeline in one simple step
 **grape.recipe.pipeline** prepares everything that is needed to run Grape
 pipelines so you don't have to write any command line options.
 
+Background
+==========
+
+Grape (Grape RNA-Seq Analysis Pipeline Environment) is a pipeline for processing
+and analyzing RNA-Seq data developed at the Bioinformatics and Genomics unit of
+the Centre for Genomic Regulation (CRG) in Barcelona. 
+
+Important Note
+==============
+
+The grape.recipe.pipeline a Buildout recipe used by Grape, and is not
+a standalone Python package. It is only going to be useful as installed
+by the grape.buildout package.
+
+To learn more about Grape, and to download and install it, go to the Bioinformatics 
+and Genomics website at:
+
+http://big.crg.cat/services/grape
+
 Motivation
 ==========
 
