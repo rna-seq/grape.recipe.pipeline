@@ -148,7 +148,13 @@ class MainTests(unittest.TestCase):
         result = main(OPTIONS.copy(), BUILDOUT.copy())
         self.failUnless(result == None)
 
-    def test_get_pipeline_script_command(self):
+
+class PipelineScriptTests(unittest.TestCase):
+    """
+    Test the part producing the pipeline scripts.
+    """
+
+    def test_command(self):
         """
         Test the get_pipeline_script_command
         """
@@ -161,9 +167,10 @@ class MainTests(unittest.TestCase):
         command = get_pipeline_script_command(accession, pipeline, options)
         self.failUnless(command.split(' ') == SCRIPT, command.split(' '))
 
-    def test_get_pipeline_script_command_more_options(self):
+    def test_more_options(self):
         """
-        Test the get_pipeline_script_command method with replicate
+        Test the get_pipeline_script_command method with replicate and other
+        options.
         """
         os.chdir(PATH)
         buildout = BUILDOUT.copy()
@@ -183,7 +190,7 @@ class MainTests(unittest.TestCase):
         self.failUnless(" -preprocess 'dummypreprocess' " in command)
         self.failUnless(" -preprocess_trim_length dummytrimlength" in command)
 
-    def test_get_pipeline_script_command_empty_cluster(self):
+    def test_empty_cluster(self):
         """
         Test the get_pipeline_script_command method with empty cluster
         """
@@ -194,9 +201,13 @@ class MainTests(unittest.TestCase):
         pipeline['CLUSTER'] = ''
         options = OPTIONS.copy()
         options['experiment_id'] = os.path.split(options['location'])[-1]
-        self.failUnlessRaises(AttributeError, get_pipeline_script_command, accession, pipeline, options)
+        self.failUnlessRaises(AttributeError,
+                              get_pipeline_script_command,
+                              accession,
+                              pipeline,
+                              options)
 
-    def test_get_pipeline_script_command_cluster(self):
+    def test_cluster_given(self):
         """
         Test the get_pipeline_script_command method with cluster
         """
@@ -209,14 +220,29 @@ class MainTests(unittest.TestCase):
         options['experiment_id'] = os.path.split(options['location'])[-1]
         command = get_pipeline_script_command(accession, pipeline, options)
         self.failUnless(" -cluster dummy " in command)
- 
-    def test_run_python_with_prefix(self):
+
+
+class RunPythonTests(unittest.TestCase):
+    """
+    Test the RestrictedPython part
+    """
+
+    def test_with_prefix(self):
+        """
+        Run it with an unexpected 'python:' prefix
+        """
         self.failUnlessRaises(AttributeError, run_python, "python:", {})
 
-    def test_run_python_dummy(self):
+    def test_echo(self):
+        """
+        Just a string should be echoed
+        """
         self.failUnless(run_python("'dummy'", {}) == 'dummy')
 
-    def test_run_python_accession(self):
+    def test_using_accession(self):
+        """
+        A list of uses of the accession dictionary returns the values.
+        """
         code = "accession['cell'], accession['replicate']"
         accession = {'cell': 'Cell', 'replicate': 'Replicate'}
         self.failUnless(run_python(code, accession) == "Cell Replicate")
