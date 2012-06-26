@@ -14,7 +14,7 @@ as well as a genome and a gene transcript annotation. First, Grape does the qual
 control and then aligns the reads to the genome. The core of Grape is the analysis of
 the transcriptome. Grape quantifies Gene and transcript expression levels, estimates 
 exon inclusion levels, and discovers novel splice forms for you, and includes a powerful
-web application that allows you to seamlessly publish the summary statistics locally 
+web application that allows you to seamlessly publish your summary statistics locally 
 or on the Internet. 
 While Grape can run on a standalone machine with modest hardware requirements, it is 
 designed to run in parallel on a computer cluster. Grape comes with its own default 
@@ -42,7 +42,7 @@ setup(name='grape.recipe.pipeline',
           'License :: OSI Approved :: GNU General Public License (GPL)',
           'Topic :: Software Development :: Build Tools',
           'Topic :: Software Development :: Libraries :: Python Modules',],
-      keywords='grape recipe pipeline',
+      keywords='RNA-Seq pipeline ngs transcriptome bioinformatics',
       author='Maik Roder',
       author_email='maikroeder@gmail.com',
       url='http://big.crg.cat/services/grape',
