@@ -1,6 +1,24 @@
 Next release
 ============
 
+1.1.6 (2012-06-26)
+==================
+
+Features
+-------- 
+
+- Install Cufflinks binaries
+
+Documentation
+-------------
+
+- Description and long description added to setup.py
+
+Internal
+--------
+
+- Refactoring and increase unit test coverage
+
 1.1.5 (2012-05-18)
 ==================
 

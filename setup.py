@@ -4,9 +4,23 @@ grape.recipe.pipeline
 """
 from setuptools import setup, find_packages
 
-version = '1.1.5'
+version = '1.1.6'
 
-long_description = ''
+long_description = """Grape is a pipeline for processing and analyzing RNA-Seq data.
+RNA-Seq is a next generation sequencing technology used to sequence cellular RNA.
+To run Grape, you need the read files in Fasta, FastQ or prealigned SAM/BAM formats,
+as well as a genome and a gene transcript annotation. First, Grape does the quality 
+control and then aligns the reads to the genome. The core of Grape is the analysis of
+the transcriptome. Grape quantifies Gene and transcript expression levels, estimates 
+exon inclusion levels, and discovers novel splice forms for you, and includes a powerful
+web application that allows you to seamlessly publish the summary statistics locally 
+or on the Internet. 
+While Grape can run on a standalone machine with modest hardware requirements, it is 
+designed to run in parallel on a computer cluster. Grape comes with its own default 
+mapping and quantification tools, and makes it easy to replace any of these tools with 
+your own, given that they support popular data interchange formats. Grape is being actively
+developed at the CRG, and is used in dozens of projects with massive datasets, 
+like the Illumina Body Map Project (HBM) and the ENCODE project."""
 entry_point = 'grape.recipe.pipeline:Recipe'
 entry_points = {"zc.buildout": [
                   "default = grape.recipe.pipeline:Recipe",
@@ -14,7 +28,7 @@ entry_points = {"zc.buildout": [
 
 setup(name='grape.recipe.pipeline',
       version=version,
-      description="grape.recipe.pipeline",
+      description="Grape is a pipeline for processing and analyzing RNA-Seq data",
       long_description=long_description,
       # Get more strings from http://www.python.org/pypi?%3Aaction=list_classifiers
       classifiers=[
@@ -29,8 +43,8 @@ setup(name='grape.recipe.pipeline',
           'Topic :: Software Development :: Libraries :: Python Modules',],
       keywords='grape recipe pipeline',
       author='Maik Roder',
-      author_email='roeder@berg.net',
-      url='http://big.crg.cat/bioinformatics_and_genomics',
+      author_email='maikroeder@gmail.com',
+      url='http://big.crg.cat/services/grape',
       license='GPL',
       packages=find_packages(exclude=['ez_setup']),
       namespace_packages=['grape', 'grape.recipe'],

@@ -19,6 +19,13 @@ from RestrictedPython import compile_restricted
 from RestrictedPython.Guards import safe_builtins
 from RestrictedPython.PrintCollector import PrintCollector
 
+CUFFLINKS_BINARIES = ('cuffcompare',
+                      'cuffdiff',
+                      'cufflinks',
+                      'cuffmerge',
+                      'gffread',
+                      'gtf_to_sam')
+
 
 class InstallationState:
     """
@@ -74,10 +81,10 @@ def run_python(code, accession):
         _getattr_=getattr)           # Pass the standard getattr
 
     # The code is now executed in the restricted environment
-    exec(compiled) in restricted_globals
+    exec(compiled) in restricted_globals  # pylint: disable=W0122
 
     # We collect the result variable from the restricted environment
-    return restricted_globals['result']
+    return restricted_globals['result'].strip()
 
 
 def install_bin_folder(options, buildout, bin_folder):
@@ -235,105 +242,99 @@ def install_read_list(options, buildout, accession):
     read_file = open(target, 'w')
     number_of_reads = len(accession['file_location'].split('\n'))
     for number in range(0, number_of_reads):
+        labels = {}
         file_location = accession['file_location'].split('\n')[number]
-        if 'pair_id' in accession:
-            pair_id = accession['pair_id'].split('\n')[number]
-            if len(accession['pair_id'].split('\n')) != number_of_reads:
-                message = ["pair_id needs to have exactly one line for each ",
-                           "file defined in file_locations in accession %s"]
-                raise AttributeError("".join(message) % accession['accession'])
-        else:
-            if 'labeling' in buildout:
-                pair_id = buildout['labeling']['pair_id'].strip()
-                if pair_id.startswith("python:"):
-                    pair_id = run_python(pair_id[7:], accession)
+        for attribute in ['pair_id', 'mate_id', 'label']:
+            if attribute in accession:
+                check_attribute(attribute, accession, number_of_reads)
+                labels[attribute] = accession[attribute].split('\n')[number]
+            elif 'labeling' in buildout:
+                value = buildout['labeling'][attribute].strip()
+                if value.startswith("python:"):
+                    labels[attribute] = run_python(value[7:], accession)
+                    if attribute == 'mate_id':
+                        if number_of_reads > 1:
+                            value = "%s.%s" % (labels[attribute], number + 1)
+                            labels[attribute] = value
             else:
-                message = "Specify a pair_id attribute for accession %s"
-                raise AttributeError(message % accession['accession'])
-
-        if 'mate_id' in accession:
-            mate_id = accession['mate_id'].split('\n')[number]
-            if len(accession['mate_id'].split('\n')) != number_of_reads:
-                message = ["mate_id needs to have exactly one line for each ",
-                           "file defined in file_locations in accession %s"]
-                raise AttributeError("".join(message) % accession['accession'])
-        else:
-            if 'labeling' in buildout:
-                mate_id = buildout['labeling']['mate_id'].strip()
-                if mate_id.startswith("python:"):
-                    # The mate id gets a postfix of ".1" and ".2"
-                    mate_id = run_python(mate_id[7:], accession).strip()
-                    if number_of_reads > 1:
-                        # In the absence of the file type, just number in order
-                        mate_id = "%s.%s" % (mate_id, number + 1)
-            else:
-                message = "Specify a mate_id attribute for accession %s"
-                raise AttributeError(message % accession['accession'])
-
-        if 'label' in accession:
-            label = accession['label'].split('\n')[number]
-            if len(accession['label'].split('\n')) != number_of_reads:
-                message = ["label needs to have exactly one line for each ",
-                           "file defined in file_locations in accession %s"]
-                raise AttributeError("".join(message) % options['accession'])
-        else:
-            if 'labeling' in buildout:
-                label = buildout['labeling']['label'].strip()
-                if label.startswith("python:"):
-                    label = run_python(label[7:], accession)
-            else:
-                message = "Specify a label attribute for accession %s"
-                raise AttributeError(message % options['accession'])
-
-        file_name = os.path.split(file_location.strip())[1]
-        if file_name.split('.')[-1] == "bam":
-            pass
-        elif file_name.split('.')[-1] == "gz":
-            file_name = file_name[:-3]
-        else:
-            message = "Expecting .fastq file to be gzipped: %s"
-            raise AttributeError(message % file_location)
-        labels = (file_name.strip(),
-                  pair_id.strip().replace(' ', ''),
-                  mate_id.strip().replace(' ', ''),
-                  label.strip().replace(' ', ''))
+                template = "Specify a %s attribute for accession %s"
+                message = template % (attribute, options['accession'])
+                raise AttributeError(message)
+        labels = readlist_labels(file_location, labels)
         read_file.write('\t'.join(labels))
         read_file.write('\n')
     read_file.close()
 
 
+def check_attribute(attribute, accession, number_of_reads):
+    """The attribute needs to have as many items as number of reads"""
+    if len(accession[attribute].split('\n')) != number_of_reads:
+        message = ["%s needs to have exactly one line for each " % attribute,
+                   "file defined in file_locations in accession %s"]
+        raise AttributeError("".join(message) % accession['accession'])
+
+
+def readlist_labels(file_location, labels):
+    """Validate the filename and"""
+    file_name = os.path.split(file_location.strip())[1]
+    if file_name.split('.')[-1] == "bam":
+        pass
+    elif file_name.split('.')[-1] == "gz":
+        file_name = file_name[:-3]
+    else:
+        message = "Expecting .fastq file to be gzipped: %s"
+        raise AttributeError(message % file_location)
+    labels = (file_name.strip(),
+              labels['pair_id'].strip().replace(' ', ''),
+              labels['mate_id'].strip().replace(' ', ''),
+              labels['label'].strip().replace(' ', ''))
+    return labels
+
+
 def install_dependencies(buildout, bin_folder):
     """
-    Install the flux, overlap and gem binaries.
+    Install the flux, overlap, gem and cufflinks binaries.
     """
-
     # Remove any existing flux in the pipeline bin folder
     buildout_directory = buildout['buildout']['directory']
-    flux = os.path.join(buildout_directory, 'var/pipeline/bin/flux')
-    if INSTALLATION_STATE.get_reinstall(flux):
-        # If the flux has been installed, then the dependencies are installed
-        # already.
-        print "-> Not reinstall"
+    dependencies_bin = os.path.join(buildout_directory, 'var/pipeline/bin')
+    # Do nothing if the dependencies have been installed already
+    if INSTALLATION_STATE.get_reinstall(dependencies_bin):
         return
+    install_dependency_flux(buildout, bin_folder)
+    install_dependency_overlap(buildout, bin_folder)
+    install_dependency_gem(buildout, bin_folder)
+    install_dependency_cufflinks(buildout, bin_folder)
+    # Mark dependencies as installed
+    INSTALLATION_STATE.set_reinstall(dependencies_bin)
 
-    if os.path.exists(flux):
-        os.remove(flux)
-    if os.path.exists(flux):
+
+def install_dependency_flux(buildout, bin_folder):
+    """Make symbolic links to the Flux"""
+    buildout_directory = buildout['buildout']['directory']
+    target = os.path.join(bin_folder, 'flux')
+    if os.path.exists(target):
+        os.remove(target)
+    if os.path.exists(target):
         raise AttributeError
-
+    buildout_directory = buildout['buildout']['directory']
     # The flux gets install inside the var/pipeline/bin folder
     pipeline_bin = os.path.join(buildout_directory, 'src/flux/bin')
-    os.symlink(os.path.join(pipeline_bin, 'flux'), flux)
-    if not os.path.exists(flux):
-        raise AttributeError("Flux shell script not found", flux)
+    os.symlink(os.path.join(pipeline_bin, 'flux'), target)
+    if not os.path.exists(target):
+        raise AttributeError("Flux shell script not found", target)
 
-    # Make symbolic links to overlap
+
+def install_dependency_overlap(buildout, bin_folder):
+    """Make symbolic links to overlap"""
     target = os.path.join(bin_folder, 'overlap')
     os.symlink(buildout['settings']['overlap'], target)
     if not os.path.exists(target):
         raise AttributeError("Overlap binary not found: %s" % target)
 
-    # Make symbolic links to the gem binaries
+
+def install_dependency_gem(buildout, bin_folder):
+    """Make symbolic links to the gem binaries"""
     gem_binary_glob = os.path.join(buildout['settings']['gem_folder'], 'gem-*')
     for source in glob.glob(gem_binary_glob):
         gem_binary = os.path.split(source)[-1]
@@ -342,9 +343,17 @@ def install_dependencies(buildout, bin_folder):
         if not os.path.exists(target):
             raise AttributeError("Gem binary not found: %s" % target)
 
-    if INSTALLATION_STATE.set_reinstall(flux):
-        # Dependencies are installed, set flux as representative
-        return
+
+def install_dependency_cufflinks(buildout, bin_folder):
+    """Make symbolic links to Cufflinks"""
+    buildout_directory = buildout['buildout']['directory']
+    cufflinks_folder = os.path.join(buildout_directory, 'src/cufflinks')
+    for cufflinks_binary in CUFFLINKS_BINARIES:
+        source = os.path.join(cufflinks_folder, cufflinks_binary)
+        target = os.path.join(bin_folder, cufflinks_binary)
+        os.symlink(source, target)
+        if not os.path.exists(target):
+            raise AttributeError("Cufflinks binary not found: %s" % target)
 
 
 def parse_read_length(accession):
@@ -463,31 +472,10 @@ def quick(options, buildout):
     options = {'accession': 'Run',
                'location': options['location'],
                }
-    fastqs = glob.glob("*.fastq.gz")
-    if len(fastqs) == 0:
-        raise AttributeError("Please drop *.fastq.gz files into this folder")
-
-    gtfs = glob.glob("*.gtf")
-    if len(gtfs) != 1:
-        template = "Please provide just one genome file. Found: %s"
-        raise AttributeError(template % gtfs)
-
-    fas = glob.glob("*.fa")
-    if len(gtfs) != 1:
-        template = "Please provide just one annotation file. Found: %s"
-        raise AttributeError(template % fas)
-
-    species = None
-    if "gencode.v7.annotation.ok.gtf" in gtfs:
-        if "H.sapiens.genome.hg19.main.fa" in fas:
-            species = "Homo sapiens"
-    elif "mm9_ucsc_UCSC_genes.gtf" in gtfs:
-        if "M.musculus.genome.mm9.main.fa" in fas:
-            species = "Mus musculus"
-    elif "flyBase.exons.genes_real.transcripts.gtf" in gtfs:
-        if "D.melanogaster.genome.fa" in fas:
-            species = "Drosophila Melanogaster"
-
+    fastqs = quick_fastqs()
+    gtfs = quick_gtf()
+    fas = quick_fa()
+    species = quick_species(gtfs, fas)
     if species is None:
         template = "Genome and annotation files don't match: %s %s"
         raise AttributeError(template % (gtfs, fas))
@@ -524,6 +512,47 @@ def quick(options, buildout):
                 'pipeline': pipeline
                 }
     main(options, buildout)
+
+
+def quick_fastqs():
+    """Return list of .fastq files found"""
+    fastqs = glob.glob("*.fastq.gz")
+    if len(fastqs) == 0:
+        raise AttributeError("Please drop *.fastq.gz files into this folder")
+    return fastqs
+
+
+def quick_gtf():
+    """Return list of .gtf files found"""
+    gtfs = glob.glob("*.gtf")
+    if len(gtfs) != 1:
+        template = "Please provide just one genome file. Found: %s"
+        raise AttributeError(template % gtfs)
+    return gtfs
+
+
+def quick_fa():
+    """Return list of .fa files found"""
+    fas = glob.glob("*.fa")
+    if len(fas) != 1:
+        template = "Please provide just one annotation file. Found: %s"
+        raise AttributeError(template % fas)
+    return fas
+
+
+def quick_species(gtfs, fas):
+    """Deduct species from given gtf ans fas files"""
+    species = None
+    if "gencode.v7.annotation.ok.gtf" in gtfs:
+        if "H.sapiens.genome.hg19.main.fa" in fas:
+            species = "Homo sapiens"
+    elif "mm9_ucsc_UCSC_genes.gtf" in gtfs:
+        if "M.musculus.genome.mm9.main.fa" in fas:
+            species = "Mus musculus"
+    elif "flyBase.exons.genes_real.transcripts.gtf" in gtfs:
+        if "D.melanogaster.genome.fa" in fas:
+            species = "Drosophila Melanogaster"
+    return species
 
 
 def main(options, buildout):
