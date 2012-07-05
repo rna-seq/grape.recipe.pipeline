@@ -156,7 +156,7 @@ class MainTests(unittest.TestCase):
         if os.path.exists('src/pipeline/bin'):
             os.removedirs('src/pipeline/bin')
         os.makedirs('src/pipeline/bin')
-        
+
         overlap_path = os.path.join(PATH, 'overlap')
         overlap = open(overlap_path, 'w')
         overlap.write('dummy')

@@ -380,6 +380,7 @@ def install_dependency_cufflinks(buildout, bin_folder):
         if not os.path.exists(target):
             raise AttributeError("Cufflinks binary not found: %s" % target)
 
+
 def install_dependency_fastqc(buildout, bin_folder):
     """Make symbolic links to Fastqc"""
     buildout_directory = buildout['buildout']['directory']
