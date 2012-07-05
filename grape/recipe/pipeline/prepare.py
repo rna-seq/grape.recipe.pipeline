@@ -114,31 +114,46 @@ def install_bin_folder(options, buildout, bin_folder):
     # Make a symbolic link to the global bin folder in var/pipeline in the
     # part
     os.symlink(bin_folder, target)
+    if not os.path.exists(target):
+        raise AttributeError(target)
 
     if not INSTALLATION_STATE.get_reinstall(bin_folder):
         # Use the same shebang for all perl scripts
         perlscripts = os.path.join(bin_folder, '*.pl')
-        for perlscript in glob.glob(perlscripts):
-            perl_file = open(os.path.join(bin_folder, perlscript), 'r')
-            # Just the read the first line, which is expected to be the shebang
-            shebang = perl_file.readline()
-            # Make sure the shebang is as expected
-            if not shebang.strip() in ['#!/soft/bin/perl', '#!/usr/bin/perl']:
-                print "All perl scripts are expected to start with"
-                print "#!/soft/bin/perl or #!/usr/bin/perl"
-                print "This one (%s) starts with %s" % (perlscript, shebang)
-                raise AttributeError
-            # Read the rest of the file only, omitting the shebang
-            content = perl_file.read()
-            perl_file.close()
-            # Open the file again, this time for writing
-            perl_file = open(os.path.join(bin_folder, perlscript), 'w')
-            # Write the new shebang using our own perl version as defined in
-            # the buildout.cfg
-            perl_file.write("#!%s\n" % buildout['settings']['perl'])
-            # Write the rest of the content
-            perl_file.write(content)
-            perl_file.close()
+        for perl_script in glob.glob(perlscripts):
+            perl_script_path = os.path.join(bin_folder, perl_script)
+            patch_perl_script(buildout, perl_script_path)
+
+
+def patch_perl_script(buildout, perl_script_path):
+    """
+    The shebang contained in perl scripts is changed to use the perl version
+    configured in the settings section of the buildout.
+    """
+    custom_shebang = "#!%s\n" % buildout['settings']['perl']
+    perl_file = open(perl_script_path, 'r')
+    # Just the read the first line, which is expected to be the shebang
+    shebang = perl_file.readline().strip()
+    # The shebang is already ok, so just return
+    if shebang == custom_shebang:
+        perl_file.close()
+        return
+    # Make sure the shebang is as expected
+    if (not shebang.startswith('#!')) or (not 'perl' in shebang):
+        print "Expected script to start with #! and include the string 'perl'"
+        print "This one (%s) starts with %s" % (perl_script_path, shebang)
+        raise AttributeError
+    # Read the rest of the file only, omitting the shebang
+    content = perl_file.read()
+    perl_file.close()
+    # Open the file again, this time for writing
+    perl_file = open(perl_script_path, 'w')
+    # Write the new shebang using our own perl version as defined in
+    # the buildout.cfg
+    perl_file.write(custom_shebang)
+    # Write the rest of the content
+    perl_file.write(content)
+    perl_file.close()
 
 
 def install_lib_folder(options, buildout, lib_folder):
@@ -164,6 +179,8 @@ def install_lib_folder(options, buildout, lib_folder):
         os.remove(target)
     # And put in the new link
     os.symlink(lib_folder, target)
+    if not os.path.exists(target):
+        raise AttributeError(target)
 
 
 def install_results_folder(options, results_folder):
@@ -181,6 +198,8 @@ def install_results_folder(options, results_folder):
         os.remove(target)
     # And put in the new link
     os.symlink(results_folder, target)
+    if not os.path.exists(target):
+        raise AttributeError(target)
 
 
 def install_gemindices_folder(options, gemindices_folder):
@@ -197,6 +216,8 @@ def install_gemindices_folder(options, gemindices_folder):
         os.remove(target)
     # And put in the new link
     os.symlink(gemindices_folder, target)
+    if not os.path.exists(target):
+        raise AttributeError(target)
 
 
 def install_read_folder(options, accession):
@@ -223,6 +244,7 @@ def install_read_folder(options, accession):
         # This is so that tricks like ../ don't work
         if not os.path.exists(file_location):
             print "Warning! File does not exist: %s" % file_location
+            continue
         # Make symbolic links to the read files
         # Take just the file name from the file location
         filename = os.path.split(file_location)[1]
@@ -232,6 +254,8 @@ def install_read_folder(options, accession):
             template = "Duplicated read files: \n%s"
             raise AttributeError(template % accession['file_location'])
         os.symlink(file_location, target)
+        if not os.path.exists(target):
+            raise AttributeError(target)
 
 
 def install_read_list(options, buildout, accession):
@@ -305,6 +329,7 @@ def install_dependencies(buildout, bin_folder):
     install_dependency_overlap(buildout, bin_folder)
     install_dependency_gem(buildout, bin_folder)
     install_dependency_cufflinks(buildout, bin_folder)
+    install_dependency_fastqc(buildout, bin_folder)
     # Mark dependencies as installed
     INSTALLATION_STATE.set_reinstall(dependencies_bin)
 
@@ -354,6 +379,21 @@ def install_dependency_cufflinks(buildout, bin_folder):
         os.symlink(source, target)
         if not os.path.exists(target):
             raise AttributeError("Cufflinks binary not found: %s" % target)
+
+def install_dependency_fastqc(buildout, bin_folder):
+    """Make symbolic links to Fastqc"""
+    buildout_directory = buildout['buildout']['directory']
+    fastqc_folder = os.path.join(buildout_directory, 'src/fastqc')
+    fastqc_binary = 'fastqc'
+    source = os.path.join(fastqc_folder, fastqc_binary)
+    os.chmod(source, 0755)
+    target = os.path.join(bin_folder, fastqc_binary)
+    os.symlink(source, target)
+    if not os.path.exists(target):
+        raise AttributeError(target)
+    patch_perl_script(buildout, target)
+    if not os.path.exists(target):
+        raise AttributeError("Fastqc binary not found: %s" % target)
 
 
 def parse_read_length(accession):

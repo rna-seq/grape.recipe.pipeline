@@ -145,7 +145,28 @@ class MainTests(unittest.TestCase):
         Test the main method
         """
         os.chdir(PATH)
-        result = main(OPTIONS.copy(), BUILDOUT.copy())
+        if os.path.exists('src/fastqc'):
+            os.remove('src/fastqc')
+        os.makedirs('src/fastqc')
+        fastqc = open('src/fastqc/fastqc', 'w')
+        perl_code = ('#!/soft/bin/perl', 'use warnings;')
+        fastqc.write('\n'.join(perl_code))
+        fastqc.close()
+
+        if os.path.exists('src/pipeline/bin'):
+            os.removedirs('src/pipeline/bin')
+        os.makedirs('src/pipeline/bin')
+        
+        overlap_path = os.path.join(PATH, 'overlap')
+        overlap = open(overlap_path, 'w')
+        overlap.write('dummy')
+        overlap.close()
+
+        buildout = BUILDOUT.copy()
+        buildout['settings'] = {'perl': '/soft/bin/perl',
+                                'overlap': overlap_path,
+                                'gem_folder': PATH}
+        result = main(OPTIONS.copy(), buildout)
         self.failUnless(result == None)
 
 
