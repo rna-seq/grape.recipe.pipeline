@@ -18,7 +18,7 @@ the Centre for Genomic Regulation (CRG) in Barcelona.
 Important Note
 ==============
 
-The grape.recipe.pipeline package is a a Buildout recipe used by Grape, and is not
+The grape.recipe.pipeline package is a Buildout recipe used by Grape, and is not
 a standalone Python package. It is only going to be useful as installed
 by the grape.buildout package.
 
@@ -56,7 +56,7 @@ think about the command line options.
 Installation
 ============
 
-The grape.recipe.pipeline package is already installed by grape.pipeline, so
+The grape.recipe.pipeline package is already installed by grape.buildout, so
 you don't have to do this. 
 
 If you want to install it as part of a buildout, you would have to add this
