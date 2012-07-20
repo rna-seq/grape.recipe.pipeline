@@ -15,9 +15,6 @@ The pipeline attribute specifies the section defining the pipeline options.
 import os
 import shutil
 import glob
-from RestrictedPython import compile_restricted
-from RestrictedPython.Guards import safe_builtins
-from RestrictedPython.PrintCollector import PrintCollector
 
 CUFFLINKS_BINARIES = ('cuffcompare',
                       'cuffdiff',
@@ -49,42 +46,6 @@ class InstallationState:
         return self.state.get(path, False)
 
 INSTALLATION_STATE = InstallationState()
-
-
-def run_python(code, accession):
-    """
-    Run some restricted Python code for constructing the labels of accessions
-    """
-
-    if code.startswith("python:"):
-        raise AttributeError("Prefix python: should be removed")
-
-    # In order to get the result of the Python code out, we have to wrap it
-    # like this
-    code = 'print ' + code + ';result = printed'
-
-    # We compile the code in a restricted environment
-    compiled = compile_restricted(code, '<string>', 'exec')
-
-    # The getter is needed so that attributes from the accession can be used
-    # for the labels
-    def mygetitem(obj, attr):
-        """Just get the attribute from the object"""
-        return obj[attr]
-
-    # The following globals are usable from the restricted Python code
-    restricted_globals = dict(
-        __builtins__=safe_builtins,  # Use only some safe Python builtins
-        accession=accession,         # The accession is needed for the labels
-        _print_=PrintCollector,      # Pass this to get hold of the result
-        _getitem_=mygetitem,         # Needed for accessing the accession
-        _getattr_=getattr)           # Pass the standard getattr
-
-    # The code is now executed in the restricted environment
-    exec(compiled) in restricted_globals  # pylint: disable=W0122
-
-    # We collect the result variable from the restricted environment
-    return restricted_globals['result'].strip()
 
 
 def install_bin_folder(options, buildout, bin_folder):
@@ -272,14 +233,6 @@ def install_read_list(options, buildout, accession):
             if attribute in accession:
                 check_attribute(attribute, accession, number_of_reads)
                 labels[attribute] = accession[attribute].split('\n')[number]
-            elif 'labeling' in buildout:
-                value = buildout['labeling'][attribute].strip()
-                if value.startswith("python:"):
-                    labels[attribute] = run_python(value[7:], accession)
-                    if attribute == 'mate_id':
-                        if number_of_reads > 1:
-                            value = "%s.%s" % (labels[attribute], number + 1)
-                            labels[attribute] = value
             else:
                 template = "Specify a %s attribute for accession %s"
                 message = template % (attribute, options['accession'])

@@ -1,3 +1,8 @@
+1.1.8 (2012-07-20)
+==================
+
+- Remove labeling through RestrictedPython, promoting explicit labels
+
 1.1.7 (2012-07-05)
 ==================
 

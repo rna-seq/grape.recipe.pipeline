@@ -4,7 +4,7 @@ grape.recipe.pipeline
 """
 from setuptools import setup, find_packages
 
-version = '1.1.7'
+version = '1.1.8'
 
 long_description = """The grape.recipe.pipeline package is a Buildout recipe used for
 configuring Grape, a pipeline used for processing and analyzing RNA-Seq data.
@@ -59,7 +59,6 @@ setup(name='grape.recipe.pipeline',
       install_requires=['setuptools',
                         'zc.buildout',
                         # -*- Extra requirements: -*-
-                        'RestrictedPython',
                         ],
       entry_points=entry_points,
       )

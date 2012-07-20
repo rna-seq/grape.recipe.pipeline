@@ -8,7 +8,6 @@ import shutil
 from pkg_resources import get_provider
 
 from grape.recipe.pipeline.prepare import main
-from grape.recipe.pipeline.prepare import run_python
 from grape.recipe.pipeline.prepare import get_pipeline_script_command
 from grape.recipe.pipeline.prepare import CUFFLINKS_BINARIES
 
@@ -241,32 +240,6 @@ class PipelineScriptTests(unittest.TestCase):
         options['experiment_id'] = os.path.split(options['location'])[-1]
         command = get_pipeline_script_command(accession, pipeline, options)
         self.failUnless(" -cluster dummy " in command)
-
-
-class RunPythonTests(unittest.TestCase):
-    """
-    Test the RestrictedPython part
-    """
-
-    def test_with_prefix(self):
-        """
-        Run it with an unexpected 'python:' prefix
-        """
-        self.failUnlessRaises(AttributeError, run_python, "python:", {})
-
-    def test_echo(self):
-        """
-        Just a string should be echoed
-        """
-        self.failUnless(run_python("'dummy'", {}) == 'dummy')
-
-    def test_using_accession(self):
-        """
-        A list of uses of the accession dictionary returns the values.
-        """
-        code = "accession['cell'], accession['replicate']"
-        accession = {'cell': 'Cell', 'replicate': 'Replicate'}
-        self.failUnless(run_python(code, accession) == "Cell Replicate")
 
 
 def test_suite():
