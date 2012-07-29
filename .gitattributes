@@ -2,4 +2,8 @@
 /CHANGES.txt -text
 /README.md -text
 /README.txt -text
+docs/Makefile -text
+docs/make.bat -text
+docs/source/conf.py -text
+docs/source/index.rst -text
 /version.txt -text
