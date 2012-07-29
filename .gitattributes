@@ -1,4 +1,5 @@
 * text=auto !eol
 /CHANGES.txt -text
+/README.md -text
 /README.txt -text
 /version.txt -text
