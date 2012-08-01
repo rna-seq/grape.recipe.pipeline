@@ -1,4 +1,5 @@
 * text=auto !eol
+/.travis.yml -text
 /CHANGES.txt -text
 /README.md -text
 /README.txt -text
