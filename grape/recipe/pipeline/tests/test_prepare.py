@@ -5,14 +5,13 @@ Test for prepare.py
 import os
 import unittest
 import shutil
-from pkg_resources import get_provider
 
 from grape.recipe.pipeline.prepare import main
 from grape.recipe.pipeline.prepare import get_pipeline_script_command
 from grape.recipe.pipeline.prepare import CUFFLINKS_BINARIES
 
-PROVIDER = get_provider('grape.recipe.pipeline')
-SANDBOX = PROVIDER.get_resource_filename("", 'tests/sandbox/')
+HERE = os.path.join(os.path.dirname(__file__))
+SANDBOX = os.path.join(HERE, 'sandbox/')
 PATH = os.path.join(SANDBOX, 'buildout')
 OPTIONS = {
     'accession': 'TestRun',
