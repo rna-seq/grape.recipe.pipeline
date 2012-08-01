@@ -2,6 +2,7 @@
 /.travis.yml -text
 /CHANGES.txt -text
 /README.md -text
+/README.rst -text
 /README.txt -text
 docs/Makefile -text
 docs/make.bat -text
