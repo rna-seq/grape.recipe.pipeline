@@ -5,13 +5,13 @@ Test for prepare.py
 import os
 import unittest
 import shutil
+import tempfile
 
 from grape.recipe.pipeline.prepare import main
 from grape.recipe.pipeline.prepare import get_pipeline_script_command
 from grape.recipe.pipeline.prepare import CUFFLINKS_BINARIES
 
-HERE = os.path.join(os.path.dirname(__file__))
-SANDBOX = os.path.join(HERE, 'sandbox/')
+SANDBOX = tempfile.mkdtemp('buildoutSetUp')
 PATH = os.path.join(SANDBOX, 'buildout')
 OPTIONS = {
     'accession': 'TestRun',
