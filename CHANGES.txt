@@ -1,3 +1,17 @@
+
+Documentation
+-------------
+
+- Add Sphinx documentation, and make it available at 
+  http://graperecipepipeline.readthedocs.org/
+
+Internal
+--------
+
+- Integrate with Travis-CI
+
+- Use tempfile for testing instead of writing to a sandbox folder
+
 1.1.8 (2012-07-20)
 ==================
 
