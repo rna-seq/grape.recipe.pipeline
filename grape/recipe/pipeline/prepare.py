@@ -281,6 +281,7 @@ def install_dependencies(buildout, bin_folder):
     install_dependency_flux(buildout, bin_folder)
     install_dependency_overlap(buildout, bin_folder)
     install_dependency_gem(buildout, bin_folder)
+    install_dependency_nextgem(buildout, bin_folder)
     install_dependency_cufflinks(buildout, bin_folder)
     install_dependency_fastqc(buildout, bin_folder)
     # Mark dependencies as installed
@@ -317,6 +318,19 @@ def install_dependency_gem(buildout, bin_folder):
     for source in glob.glob(gem_binary_glob):
         gem_binary = os.path.split(source)[-1]
         target = os.path.join(bin_folder, gem_binary)
+        os.symlink(source, target)
+        if not os.path.exists(target):
+            raise AttributeError("Gem binary not found: %s" % target)
+
+
+def install_dependency_nextgem(buildout, bin_folder):
+    """Make symbolic links to the nextgem binaries"""
+    nextgem_binary_glob = os.path.join(buildout['settings']['nextgem_folder'], 'gem-*')
+    for source in glob.glob(nextgem_binary_glob):
+        if source.endswith('.man'):
+            continue
+        nextgem_binary = os.path.split(source)[-1]
+        target = os.path.join(bin_folder, 'next%s' % nextgem_binary)
         os.symlink(source, target)
         if not os.path.exists(target):
             raise AttributeError("Gem binary not found: %s" % target)
