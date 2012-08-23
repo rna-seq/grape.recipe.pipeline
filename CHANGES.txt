@@ -1,3 +1,7 @@
+1.1.9 (2012-08-23)
+==================
+
+- Integrate the new version of Grape, installed by grape.recipe.pipeline
 
 Documentation
 -------------
