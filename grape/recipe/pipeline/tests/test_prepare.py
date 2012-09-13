@@ -10,6 +10,8 @@ import tempfile
 from grape.recipe.pipeline.prepare import main
 from grape.recipe.pipeline.prepare import get_pipeline_script_command
 from grape.recipe.pipeline.prepare import CUFFLINKS_BINARIES
+from grape.recipe.pipeline.prepare import check_read_labels
+
 
 SANDBOX = tempfile.mkdtemp('buildoutSetUp')
 PATH = os.path.join(SANDBOX, 'buildout')
@@ -19,6 +21,7 @@ OPTIONS = {
     }
 BUILDOUT = {
     'TestRun': {
+        'paired':'1',
         'file_location': '\n'.join([
             os.path.join(PATH, "src/testdata/testA.r2.fastq.gz"),
             os.path.join(PATH, "src/testdata/testA.r1.fastq.gz"),
@@ -163,7 +166,8 @@ class MainTests(unittest.TestCase):
         buildout = BUILDOUT.copy()
         buildout['settings'] = {'perl': '/soft/bin/perl',
                                 'overlap': overlap_path,
-                                'gem_folder': PATH}
+                                'gem_folder': PATH,
+                                'nextgem_folder': PATH}
         result = main(OPTIONS.copy(), buildout)
         self.failUnless(result == None)
 
@@ -239,6 +243,78 @@ class PipelineScriptTests(unittest.TestCase):
         options['experiment_id'] = os.path.split(options['location'])[-1]
         command = get_pipeline_script_command(accession, pipeline, options)
         self.failUnless(" -cluster dummy " in command)
+
+
+class ReadLabelsTests(unittest.TestCase):
+    """
+    Test the check_read_labels method.
+    """
+
+    def test_no_paired_given(self):
+        """
+        Test the check_read_labels method with a non existing paired attribute
+        """
+        accession = {}
+        self.assertRaises(AttributeError, check_read_labels, accession, 'dummy')
+
+    def test_not_paired_dummy(self):
+        """
+        Test the check_read_labels method with non paired
+        """
+        accession = {'paired':'0', 'pair_id':'', 'mate_id':'', 'label':''}
+        check_read_labels(accession, 'dummy')
+
+    def test_paired_dummy(self):
+        """
+        Test the check_read_labels method with paired
+        """
+        accession = {'paired':'1', 'pair_id':'1\n1', 'mate_id':'', 'label':''}
+        check_read_labels(accession, 'dummy')
+
+    def test_wrong_paired_dummy(self):
+        """
+        Test the check_read_labels method with paired
+        """
+        accession = {'paired':'2', 'pair_id':'', 'mate_id':'', 'label':''}
+        self.assertRaises(AttributeError, check_read_labels, accession, 'dummy')
+
+    def test_not_paired_mate_and_pair_same(self):
+        """
+        When not paired, mate_id and pair_id must be the same
+        """
+        accession = {'paired':'0', 'pair_id':'1', 'mate_id':'2', 'label':''}
+        self.assertRaises(AttributeError, check_read_labels, accession, 'dummy')
+
+    def test_not_paired_mate_and_pair_same(self):
+        """
+        All labels should be the same
+        """
+        accession = {'paired':'0', 'pair_id':'1', 'mate_id':'1', 'label':'1\n2'}
+        self.assertRaises(AttributeError, check_read_labels, accession, 'dummy')
+
+    def test_not_all_mate_ids_different(self):
+        """
+        All mate_ids must be different
+        """
+        accession = {'paired':'0', 'pair_id':'1\n1', 'mate_id':'1\n1', 'label':'1\n1'}
+        self.assertRaises(AttributeError, check_read_labels, accession, 'dummy')
+
+    def test_paired_where_pairs_not_paired_with_2(self):
+        """
+        Test the check_read_labels method where the pairs are not paired.
+        Try two lines.
+        """
+        accession = {'paired':'1', 'pair_id':'1\n2', 'mate_id':'', 'label':''}
+        self.assertRaises(AttributeError, check_read_labels, accession, 'dummy')
+
+    def test_paired_where_pairs_not_paired_with_4(self):
+        """
+        Test the check_read_labels method where the pairs are not paired
+        Try four lines.
+        """
+        accession = {'paired':'1', 'pair_id':'1\n2\n3\n4', 'mate_id':'', 'label':''}
+        self.assertRaises(AttributeError, check_read_labels, accession, 'dummy')
+
 
 
 def test_suite():

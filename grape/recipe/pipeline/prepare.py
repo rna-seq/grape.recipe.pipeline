@@ -219,6 +219,59 @@ def install_read_folder(options, accession):
             raise AttributeError(target)
 
 
+def check_read_labels(accession, experiment_id):
+    """
+    Make sure the labels are consistent with the paired information
+    """
+    if not 'paired' in accession:
+        msg = "Experiment %s is missing the paired attribute."
+        raise AttributeError(msg % experiment_id)
+    if not accession['paired'] in ["0", "1"]:
+        msg = "Wrong setting paired=%s in %s (Use paired=0 or paired=1)"
+        info = (accession['paired'], experiment_id)
+        raise AttributeError(msg % info)
+    
+    if accession['paired'] == '0':
+        # For single end mate id and pair id have to be the same
+        # So pair_id can be omitted for single end. if pair_id is missing
+        # we don't complain
+        if not accession['pair_id'] == accession['mate_id']:
+            msg = "For unpaired, mate id and pair id have to be the same: %s."
+            raise AttributeError(msg % experiment_id)
+    elif accession['paired'] == '1':
+        # pair id there can not be more that two values that are the same
+        # e.g. three testA
+        # For paired there are always 2 values that must be the same        
+        all_pairs = set(accession['pair_id'].split('\n'))
+        if not len(all_pairs) * 2 == len(accession['pair_id'].split('\n')):
+            # mate_id should all be different for paired and not paired
+            msg = "The same pair_id must be used for exactly two lines: %s"
+            raise AttributeError(msg % experiment_id)
+
+        
+    all_labels = set(accession['label'].split('\n'))
+    if not len(all_labels) == 1:
+        # Label should always be the same and should not be mixed
+        # One line for the label is also possible 
+        msg = "All labels in the label attribute should be the same: %s"
+        raise AttributeError(msg % experiment_id)
+
+    all_mates = set(accession['mate_id'].split('\n'))
+    if not len(all_mates) == len(accession['mate_id'].split('\n')):
+        # mate_id should all be different for paired and not paired
+        msg = "All mate ids need to be different: %s"
+        raise AttributeError(msg % experiment_id)
+
+        # Members of the same pair must have the same label
+        # testA.1 AND testA.2 have same label "Test"
+
+
+
+
+        
+        #import pdb; pdb.set_trace()
+        
+
 def install_read_list(options, buildout, accession):
     """
     Add a read.list.txt in the part that will be used by the pipeline.
@@ -631,6 +684,9 @@ def main(options, buildout):
         install_dependencies(buildout, bin_folder)
 
     install_pipeline_scripts(options, buildout, accession)
+
+    # Check the read labels are consistent with the paired information
+    check_read_labels(accession, experiment_id)
 
     # Install the read list file defining the labels of the reads
     install_read_list(options, buildout, accession)
