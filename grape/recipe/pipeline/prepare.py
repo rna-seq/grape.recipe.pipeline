@@ -438,6 +438,28 @@ def parse_read_length(accession):
     else:
         return None
 
+def parse_trim_length(pipeline):
+    """
+    Given a trim length, make sure it is an integer.
+    """
+    trim_length = pipeline.get('TRIMLENGTH','')
+    if trim_length.isdigit():
+        return trim_length
+    else:
+        return None
+
+def parse_flux_mem(pipeline):
+    """
+    Given a flux mem parameter, make sure it is an integer. 
+    If it ends with G (G for giga bytes), accept the integer before, and strip the G.
+    """
+    flux_mem = pipeline.get('FLUXMEM','')
+    if flux_mem.endswith('G'):
+        flux_mem = flux_mem[:-1]
+    if flux_mem.isdigit():
+        return flux_mem
+    else:
+        return None
 
 def get_pipeline_script_command(accession, pipeline, options):
     """
@@ -479,6 +501,12 @@ def get_pipeline_script_command(accession, pipeline, options):
     if 'PREPROCESS_TRIM_LENGTH' in pipeline:
         template = " -preprocess_trim_length %s"
         command += template % pipeline['PREPROCESS_TRIM_LENGTH']
+    trim_length = parse_trim_length(pipeline)
+    if not trim_length is None:
+        command += " -trimlength %s" % trim_length
+    flux_mem = parse_flux_mem(pipeline)
+    if not flux_mem is None:
+        command += " -fluxmem %sG" % flux_mem
     return command
 
 
