@@ -321,7 +321,7 @@ class ReadLabelsTests(unittest.TestCase):
         """
         Test parsing of the trim length works for integers.
         """
-        pipeline = {'TRIMLENGTH':'40'}
+        pipeline = {'MIN_RECURSIVE_MAPPING_TRIM_LENGTH':'40'}
         self.failUnless(parse_trim_length(pipeline) == '40')
     
     def test_parse_flux_mem(self):
