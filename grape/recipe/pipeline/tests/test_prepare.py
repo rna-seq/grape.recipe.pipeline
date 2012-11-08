@@ -11,6 +11,8 @@ from grape.recipe.pipeline.prepare import main
 from grape.recipe.pipeline.prepare import get_pipeline_script_command
 from grape.recipe.pipeline.prepare import CUFFLINKS_BINARIES
 from grape.recipe.pipeline.prepare import check_read_labels
+from grape.recipe.pipeline.prepare import parse_trim_length
+from grape.recipe.pipeline.prepare import parse_flux_mem
 
 
 SANDBOX = tempfile.mkdtemp('buildoutSetUp')
@@ -315,6 +317,26 @@ class ReadLabelsTests(unittest.TestCase):
         accession = {'paired':'1', 'pair_id':'1\n2\n3\n4', 'mate_id':'', 'label':''}
         self.assertRaises(AttributeError, check_read_labels, accession, 'dummy')
 
+    def test_parse_trim_length(self):
+        """
+        Test parsing of the trim length works for integers.
+        """
+        pipeline = {'TRIMLENGTH':'40'}
+        self.failUnless(parse_trim_length(pipeline) == '40')
+    
+    def test_parse_flux_mem(self):
+        """
+        Test that an integer value for fluxmem works
+        """
+        pipeline = {'FLUXMEM':'16'}
+        self.failUnless(parse_flux_mem(pipeline) == '16')
+
+    def test_parse_flux_mem_gigabyte(self):
+        """
+        Test that a number plus G works, like 16G returns 16.
+        """
+        pipeline = {'FLUXMEM':'16'}
+        self.failUnless(parse_flux_mem(pipeline) == '16')
 
 
 def test_suite():
