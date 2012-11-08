@@ -442,7 +442,7 @@ def parse_trim_length(pipeline):
     """
     Given a trim length, make sure it is an integer.
     """
-    trim_length = pipeline.get('TRIMLENGTH','')
+    trim_length = pipeline.get('MIN_RECURSIVE_MAPPING_TRIM_LENGTH','')
     if trim_length.isdigit():
         return trim_length
     else:
