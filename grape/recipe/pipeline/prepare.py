@@ -230,7 +230,7 @@ def check_read_labels(accession, experiment_id):
         msg = "Wrong setting paired=%s in %s (Use paired=0 or paired=1)"
         info = (accession['paired'], experiment_id)
         raise AttributeError(msg % info)
-    
+
     if accession['paired'] == '0':
         # For single end mate id and pair id have to be the same
         # So pair_id can be omitted for single end. if pair_id is missing
@@ -241,18 +241,17 @@ def check_read_labels(accession, experiment_id):
     elif accession['paired'] == '1':
         # pair id there can not be more that two values that are the same
         # e.g. three testA
-        # For paired there are always 2 values that must be the same        
+        # For paired there are always 2 values that must be the same
         all_pairs = set(accession['pair_id'].split('\n'))
         if not len(all_pairs) * 2 == len(accession['pair_id'].split('\n')):
             # mate_id should all be different for paired and not paired
             msg = "The same pair_id must be used for exactly two lines: %s"
             raise AttributeError(msg % experiment_id)
 
-        
     all_labels = set(accession['label'].split('\n'))
     if not len(all_labels) == 1:
         # Label should always be the same and should not be mixed
-        # One line for the label is also possible 
+        # One line for the label is also possible
         msg = "All labels in the label attribute should be the same: %s"
         raise AttributeError(msg % experiment_id)
 
@@ -262,15 +261,6 @@ def check_read_labels(accession, experiment_id):
         msg = "All mate ids need to be different: %s"
         raise AttributeError(msg % experiment_id)
 
-        # Members of the same pair must have the same label
-        # testA.1 AND testA.2 have same label "Test"
-
-
-
-
-        
-        #import pdb; pdb.set_trace()
-        
 
 def install_read_list(options, buildout, accession):
     """
@@ -378,7 +368,8 @@ def install_dependency_gem(buildout, bin_folder):
 
 def install_dependency_nextgem(buildout, bin_folder):
     """Make symbolic links to the nextgem binaries"""
-    nextgem_binary_glob = os.path.join(buildout['settings']['nextgem_folder'], 'gem-*')
+    folder = buildout['settings']['nextgem_folder']
+    nextgem_binary_glob = os.path.join(folder, 'gem-*')
     for source in glob.glob(nextgem_binary_glob):
         if source.endswith('.man'):
             continue
@@ -438,28 +429,32 @@ def parse_read_length(accession):
     else:
         return None
 
+
 def parse_trim_length(pipeline):
     """
     Given a trim length, make sure it is an integer.
     """
-    trim_length = pipeline.get('MIN_RECURSIVE_MAPPING_TRIM_LENGTH','')
+    trim_length = pipeline.get('MIN_RECURSIVE_MAPPING_TRIM_LENGTH', '')
     if trim_length.isdigit():
         return trim_length
     else:
         return None
 
+
 def parse_flux_mem(pipeline):
     """
-    Given a flux mem parameter, make sure it is an integer. 
-    If it ends with G (G for giga bytes), accept the integer before, and strip the G.
+    Given a flux mem parameter, make sure it is an integer.
+    If it ends with G (G for giga bytes), accept the integer before,
+    and strip the G.
     """
-    flux_mem = pipeline.get('FLUXMEM','')
+    flux_mem = pipeline.get('FLUXMEM', '')
     if flux_mem.endswith('G'):
         flux_mem = flux_mem[:-1]
     if flux_mem.isdigit():
         return flux_mem
     else:
         return None
+
 
 def get_pipeline_script_command(accession, pipeline, options):
     """
@@ -578,9 +573,11 @@ def quick(options, buildout):
                  'rnaExtract': 'Unknown',
                  'localization': 'Unknown',
                  'qualities': 'phred',
-                 'pair_id': '',
-                 'mate_id': '',
-                 'label': '',
+                 'pair_id': '\n'.join([str(i) for i in range(len(fastqs))]),
+                 'mate_id': '\n'.join([str(i) for i in range(len(fastqs))]),
+                 'label': '\n'.join(['Run' for i in range(len(fastqs))]),
+                 'paired': '0',
+                 'accession': 'Run'
                  }
 
     template = os.path.join(buildout_directory, 'src/pipeline/template3.0.txt')
@@ -605,7 +602,11 @@ def quick(options, buildout):
 
 def quick_fastqs():
     """Return list of .fastq files found"""
-    fastqs = glob.glob("*.fastq.gz")
+    filenames = glob.glob("*.fastq.gz")
+    cwd = os.getcwd()
+    fastqs = []
+    for filename in filenames:
+        fastqs.append(os.path.join(cwd, filename))
     if len(fastqs) == 0:
         raise AttributeError("Please drop *.fastq.gz files into this folder")
     return fastqs
@@ -613,7 +614,11 @@ def quick_fastqs():
 
 def quick_gtf():
     """Return list of .gtf files found"""
-    gtfs = glob.glob("*.gtf")
+    filenames = glob.glob("*.gtf")
+    cwd = os.getcwd()
+    gtfs = []
+    for filename in filenames:
+        gtfs.append(os.path.join(cwd, filename))
     if len(gtfs) != 1:
         template = "Please provide just one genome file. Found: %s"
         raise AttributeError(template % gtfs)
@@ -623,6 +628,10 @@ def quick_gtf():
 def quick_fa():
     """Return list of .fa files found"""
     fas = glob.glob("*.fa")
+    cwd = os.getcwd()
+    filenames = []
+    for filename in filenames:
+        fas.append(os.path.join(cwd, filename))
     if len(fas) != 1:
         template = "Please provide just one annotation file. Found: %s"
         raise AttributeError(template % fas)
@@ -630,16 +639,17 @@ def quick_fa():
 
 
 def quick_species(gtfs, fas):
-    """Deduct species from given gtf ans fas files"""
+    """Deduct species from given gtf and fas files"""
+    text = str(gtfs) + str(fas)
     species = None
-    if "gencode.v7.annotation.ok.gtf" in gtfs:
-        if "H.sapiens.genome.hg19.main.fa" in fas:
+    if "gencode.v7.annotation.ok.gtf" in text:
+        if "H.sapiens.genome.hg19.main.fa" in text:
             species = "Homo sapiens"
-    elif "mm9_ucsc_UCSC_genes.gtf" in gtfs:
-        if "M.musculus.genome.mm9.main.fa" in fas:
+    elif "mm9_ucsc_UCSC_genes.gtf" in text:
+        if "M.musculus.genome.mm9.main.fa" in text:
             species = "Mus musculus"
-    elif "flyBase.exons.genes_real.transcripts.gtf" in gtfs:
-        if "D.melanogaster.genome.fa" in fas:
+    elif "flyBase.exons.genes_real.transcripts.gtf" in text:
+        if "D.melanogaster.genome.fa" in text:
             species = "Drosophila Melanogaster"
     return species
 
