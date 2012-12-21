@@ -8,3 +8,10 @@ grape/recipe/pipeline/*.pyc
 grape/recipe/pipeline/*.pyo
 grape/recipe/pipeline/tests/*.pyc
 grape/recipe/pipeline/tests/*.pyo
+.Python
+bin
+docs/build
+grape.recipe.pipeline.egg-info
+include
+lib
+man
