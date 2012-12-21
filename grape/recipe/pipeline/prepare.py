@@ -489,6 +489,8 @@ def get_pipeline_script_command(accession, pipeline, options):
         command += " -host %s" % pipeline['HOST']
     command += " -mapper %s" % pipeline['MAPPER']
     command += " -mismatches %s" % pipeline['MISMATCHES']
+    if 'MAXINTRONLENGTH' in pipeline:
+        command += " -maxintronlength %s" % pipeline['MAXINTRONLENGTH']
     if 'description' in options:
         command += " -run_description '%s'" % options['description']
     if 'PREPROCESS' in pipeline:
