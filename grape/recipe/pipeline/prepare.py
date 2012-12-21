@@ -262,7 +262,7 @@ def check_read_labels(accession, experiment_id):
         raise AttributeError(msg % experiment_id)
 
 
-def install_read_list(options, buildout, accession):
+def install_read_list(options, accession):
     """
     Add a read.list.txt in the part that will be used by the pipeline.
     """
@@ -421,7 +421,7 @@ def parse_read_length(accession):
     read_length = accession['readType']
     if 'D' in read_length:
         read_length = read_length.split('D')[0]
-    if  'x' in read_length:
+    if 'x' in read_length:
         # Extract the read length taking the value after the x
         read_length = read_length.split('x')[1]
     if read_length.isdigit():
@@ -729,7 +729,7 @@ def main(options, buildout):
     check_read_labels(accession, experiment_id)
 
     # Install the read list file defining the labels of the reads
-    install_read_list(options, buildout, accession)
+    install_read_list(options, accession)
 
     # As a last step, set the lib and bin folder to the reinstalled state
     INSTALLATION_STATE.set_reinstall(lib_folder)
