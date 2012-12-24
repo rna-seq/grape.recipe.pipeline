@@ -66,74 +66,78 @@ The accession parameters are mostly derived from `UCSC's ENCODE controlled vocab
  
 The following parameters are used when configuring accessions:
 
- ================= ====================================================================
- ``file_location`` The full path to the file
+    ================= =====================================================
+    ``file_location`` The full path to the file
  
-                   If there is more than one file, put one file per line
- ================= ====================================================================
+                      If there is more than one file, put one file per line
+    ================= =====================================================
 
 For each line in ``file_location``, a corresponding line needs to be specified for the
 following parameters:
 
- ================= ====================================================================
- ``mate_id``       Using this label, files can be marked as belonging to one read
- ``pair_id``       Using this label, files can be associated with pairs
- ``label``         Using this label, files can be associated with the accession itself
- ================= ====================================================================
+    ================= ===================================================================
+    ``mate_id``       Using this label, files can be marked as belonging to one read
+    ``pair_id``       Using this label, files can be associated with pairs
+    ``label``         Using this label, files can be associated with the accession itself
+    ================= ===================================================================
 
 The pairing information is required:
 
- ========== ==========================================================
- ``paired`` Set this to ``0`` for unpaired reads, an ``1`` for paired.
- ========== ==========================================================
+    ========== ==========================================================
+    ``paired`` Set this to ``0`` for unpaired reads, an ``1`` for paired.
+    ========== ==========================================================
  
 Instead of risking to wrongly deduce the file type from the file extensions contained
 in the ``file_location`` parameter, it should be given explicitly here.
 
- ============= ===========================================================================
- ``type``      Set the file type. This can be set to ``fastq`` or ``bam``
- ============= ===========================================================================
+    ============= ==========================================================
+    ``type``      Set the file type. This can be set to ``fastq`` or ``bam``
+    ============= ==========================================================
 
 The qualities and the read type are important, because depending on them Grape may produce
 different results:
 
- ============= ===========================================================================
- ``qualities`` The base quality can be se to ``phred`` and ``solexa``, or if you don't
-               know the quality, you can set it to ``ignore``
- ``readType``  Paired/Single reads lengths: Specific information about cDNA sequence
-               reads including length, directionality and single versus paired read.  
+    ============= ========================================================================
+    ``qualities`` The base quality can be se to ``phred`` and ``solexa``, or if you don't
+                  know the quality, you can set it to ``ignore``
+    ``readType``  Paired/Single reads lengths: Specific information about cDNA sequence
+                  reads including length, directionality and single versus paired read.  
 
-               `See UCSC's ENCODE controlled vocabulary for readType <http://genome-test.cse.ucsc.edu/cgi-bin/hgEncodeVocab?type=readType>`_.
- ============= ===========================================================================
+                  `See UCSC's ENCODE controlled vocabulary for readType
+                  <http://genome-test.cse.ucsc.edu/cgi-bin/hgEncodeVocab?type=readType>`_.
+    ============= ========================================================================
 
 The ``replicate`` and ``species`` parameters don't change anything in the behaviour of Grape,
 but are considered essential meta data.
 
- ============= ===========================================================================
- ``replicate`` The biological replicate of a particular experiment, if the experiment is
-               a bioreplicate
- ``species``   The species, for example ``Homo sapiens``, ``Mus musculus``
- ============= ===========================================================================
+    ============= =========================================================================
+    ``replicate`` The biological replicate of a particular experiment, if the experiment is
+                  a bioreplicate
+    ``species``   The species, for example ``Homo sapiens``, ``Mus musculus``
+    ============= =========================================================================
 
 The following parameters have been used in the ENCODE project. It makes sense to
 fill in the ``cell`` parameters and the ``rnaExtract`` as well. For most projects,
 the ``localization`` is probably going to be 'cell'.
 
- ================  ===========================================================================
- ``cell``          Cell, tissue or DNA sample: Cell line or tissue used as the source of
-                   experimental material. 
+    ================  ============================================================================
+    ``cell``          Cell, tissue or DNA sample: Cell line or tissue used as the source of
+                      experimental material. 
 
-                   `See UCSC's ENCODE controlled vocabulary for cell <http://genome-test.cse.ucsc.edu/cgi-bin/hgEncodeVocab?type=cell>`_.
- ``rnaExtract``    RNA Extract: Fraction of total cellular RNA selected for by an experiment.
-                   This includes size fractionation (long versus short) and feature 
-                   fractionation (PolyA-, PolyA+, rRNA-). 
+                      `See UCSC's ENCODE controlled vocabulary for cell
+                      <http://genome-test.cse.ucsc.edu/cgi-bin/hgEncodeVocab?type=cell>`_.
+    ``rnaExtract``    RNA Extract: Fraction of total cellular RNA selected for by an experiment.
+                      This includes size fractionation (long versus short) and feature 
+                      fractionation (PolyA-, PolyA+, rRNA-). 
 
-                   `See UCSC's ENCODE controlled vocabulary for rnaExtract <http://genome-test.cse.ucsc.edu/cgi-bin/hgEncodeVocab?type=rnaExtract>`_.
- ``localization``  Cellular compartment: The cellular compartment from which RNA is extracted.
-                   Primarily used by the Transcriptome Project. 
+                      `See UCSC's ENCODE controlled vocabulary for rnaExtract
+                      <http://genome-test.cse.ucsc.edu/cgi-bin/hgEncodeVocab?type=rnaExtract>`_.
+    ``localization``  Cellular compartment: The cellular compartment from which RNA is extracted.
+                      Primarily used by the Transcriptome Project. 
  
-                   `See UCSC's ENCODE controlled vocabulary for localization <http://genome-test.cse.ucsc.edu/cgi-bin/hgEncodeVocab?type=localization>`_.
- ================  ===========================================================================
+                      `See UCSC's ENCODE controlled vocabulary for localization
+                      <http://genome-test.cse.ucsc.edu/cgi-bin/hgEncodeVocab?type=localization>`_.
+    ================  ============================================================================
 
 
 Example Accession Configuration
