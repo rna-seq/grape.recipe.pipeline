@@ -27,21 +27,21 @@ Motivation
 
 Here at the CRG, we configure all our RNASeq pipeline runs in a central place
 before running them. Once all the accessions and pipeline profiles have been defined
-and the buildout parts have been created, we start and execute them on a 
+and the buildout parts have been created, we start and execute them on an 
 `SGE <http://en.wikipedia.org/wiki/Oracle_Grid_Engine>`_ cluster.
 
-When we receive ``Fastq`` or ``bam`` files for a project, we typically have to:
+When we receive ``FASTQ`` or ``BAM`` files for a project, we typically have to:
 
-1. Define the accessions and profiles in::
+1. Define the accessions and profiles::
 
     grape.buildout/accessions/MyProject/db.cfg
     grape.buildout/profiles/MyProject/db.cfg
 
-2. Create a pipeline project folder in::
+2. Create a pipeline project folder::
 
     grape.buildout/pipelines/MyProject
 
-3. Configure the buildout in::
+3. Configure the buildout::
 
     grape.buildout/pipelines/MyProject/buildout.cfg
 
