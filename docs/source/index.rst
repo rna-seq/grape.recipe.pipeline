@@ -66,75 +66,75 @@ The accession parameters are mostly derived from `UCSC's ENCODE controlled vocab
  
 The following parameters are used when configuring accessions:
 
-============= ====================================================================
-file_location The full path to the file
-
-              If there is more than one file, put one file per line
-============= ====================================================================
+ ============= ====================================================================
+ file_location The full path to the file
+ 
+               If there is more than one file, put one file per line
+ ============= ====================================================================
 
 For each line in ``file_location``, a corresponding line needs to be specified for the
 following parameters:
 
-============= ====================================================================
-mate_id       Using this label, files can be marked as belonging to one read
-pair_id       Using this label, files can be associated with pairs
-label         Using this label, files can be associated with the accession itself
-============= ====================================================================
+ ============= ====================================================================
+ mate_id       Using this label, files can be marked as belonging to one read
+ pair_id       Using this label, files can be associated with pairs
+ label         Using this label, files can be associated with the accession itself
+ ============= ====================================================================
 
 The pairing information is required:
 
-============= ===========================================================================
-paired        Set this to ``0`` for unpaired reads, an ``1`` for paired.
-============= ===========================================================================
+ ============= ===========================================================================
+ paired        Set this to ``0`` for unpaired reads, an ``1`` for paired.
+ ============= ===========================================================================
 
 Instead of risking to wrongly deduce the file type from the file extensions contained
 in the ``file_location`` parameter, it should be given explicitly here.
 
-============= ===========================================================================
-type          Set the file type. This can be set to ``fastq`` or ``bam``
-============= ===========================================================================
+ ============= ===========================================================================
+ type          Set the file type. This can be set to ``fastq`` or ``bam``
+ ============= ===========================================================================
 
 The qualities and the read type are important, because depending on them Grape may produce
 different results:
 
-============= ===========================================================================
-qualities     The base quality can be se to ``phred`` and ``solexa``, or if you don't
-              know the quality, you can set it to ``ignore``
-readType      Paired/Single reads lengths: Specific information about cDNA sequence
-              reads including length, directionality and single versus paired read.
+ ============= ===========================================================================
+ qualities     The base quality can be se to ``phred`` and ``solexa``, or if you don't
+               know the quality, you can set it to ``ignore``
+ readType      Paired/Single reads lengths: Specific information about cDNA sequence
+               reads including length, directionality and single versus paired read.  
 
-              
-              `See UCSC's ENCODE controlled vocabulary for readType <http://genome-test.cse.ucsc.edu/cgi-bin/hgEncodeVocab?type=readType>`_.
-============= ===========================================================================
+               
+               `See UCSC's ENCODE controlled vocabulary for readType <http://genome-test.cse.ucsc.edu/cgi-bin/hgEncodeVocab?type=readType>`_.
+ ============= ===========================================================================
 
 The replicate and species parameters don't change anything in the behaviour of Grape,
 but are considered essential meta data.
 
-============= ===========================================================================
-replicate     The biological replicate of a particular experiment if the experiment is
-              a bioreplicate
-species       The species, for example ``Homo sapiens``, ``Mus musculus``
-============= ===========================================================================
+ ============= ===========================================================================
+ replicate     The biological replicate of a particular experiment if the experiment is
+               a bioreplicate
+ species       The species, for example ``Homo sapiens``, ``Mus musculus``
+ ============= ===========================================================================
 
 The following parameters have been used in the ENCODE project. It makes sense to
 fill in the ``cell`` parameters and the ``rnaExtract`` as well. For most projects,
 the ``localization`` is probably going to be 'cell'.
 
-============  ===========================================================================
-cell          Cell, tissue or DNA sample: Cell line or tissue used as the source of
-              experimental material.
+ ============  ===========================================================================
+ cell          Cell, tissue or DNA sample: Cell line or tissue used as the source of
+               experimental material. 
 
-              `See UCSC's ENCODE controlled vocabulary for cell <http://genome-test.cse.ucsc.edu/cgi-bin/hgEncodeVocab?type=cell>`_.
-rnaExtract    RNA Extract: Fraction of total cellular RNA selected for by an experiment.
-              This includes size fractionation (long versus short) and feature 
-              fractionation (PolyA-, PolyA+, rRNA-).
+               `See UCSC's ENCODE controlled vocabulary for cell <http://genome-test.cse.ucsc.edu/cgi-bin/hgEncodeVocab?type=cell>`_.
+ rnaExtract    RNA Extract: Fraction of total cellular RNA selected for by an experiment.
+               This includes size fractionation (long versus short) and feature 
+               fractionation (PolyA-, PolyA+, rRNA-). 
 
-              `See UCSC's ENCODE controlled vocabulary for rnaExtract <http://genome-test.cse.ucsc.edu/cgi-bin/hgEncodeVocab?type=rnaExtract>`_.
-localization  Cellular compartment: The cellular compartment from which RNA is extracted.
-              Primarily used by the Transcriptome Project.
-
-              `See UCSC's ENCODE controlled vocabulary for localization <http://genome-test.cse.ucsc.edu/cgi-bin/hgEncodeVocab?type=localization>`_.
-============  ===========================================================================
+               `See UCSC's ENCODE controlled vocabulary for rnaExtract <http://genome-test.cse.ucsc.edu/cgi-bin/hgEncodeVocab?type=rnaExtract>`_.
+ localization  Cellular compartment: The cellular compartment from which RNA is extracted.
+               Primarily used by the Transcriptome Project. 
+ 
+               `See UCSC's ENCODE controlled vocabulary for localization <http://genome-test.cse.ucsc.edu/cgi-bin/hgEncodeVocab?type=localization>`_.
+ ============  ===========================================================================
 
 
 Example Accession Configuration
@@ -187,35 +187,83 @@ Profiles Configuration Parameters
 The following parameters are configured in the `profiles` folder, and specify the
 general parameters of the Grape pipeline.
 
-=================================   ======================================================
-TEMPLATE                            Path to the template defining the pipeline steps
-PROJECTID                           Name of the project
-THREADS                             Number of threads to use
-DB                                  Statistic results database name
-COMMONDB                            Meta data Database name
-MAPPER                              Mapper
-MISMATCHES                          Number of mismatches
-GENOMESEQ                           Genome file
-ANNOTATION                          Annotation file
-MAXINTRONLENGTH                     Sets the maximum length of splits allowed during the 
-                                    postprocessing of the files generated by gem-2-sam 
-                                    removing the noise. 
-                                    
-                                    The default is set to 50k, which is reasonable in 
-                                    mammals, however different specise may require 
-                                    different settings. Setting it to 0 will remove this
-                                    filter.
-CLUSTER                             Name of the cluster node to use
-HOST                                MySQL database host name
-PREPROCESS                          Path to a custom script used for preprocessing each
-                                    of the read files before anything else
-PREPROCESS_TRIM_LENGTH              A preprocessing step that trims the reads by the given
-                                    nucleotide length
-MIN_RECURSIVE_MAPPING_TRIM_LENGTH   Tunes the minimum length to which a read will be
-                                    trimmed during the recursive mapping.
-FLUXMEM                             Configures the memory used by the Flux. The default
-                                    value is 16G
-=================================   ======================================================
+The project id should be as short as possible.
+
+ =================================   ======================================================
+ PROJECTID                           Name of the project
+ =================================   ======================================================
+
+There are two predefined pipeline templates, one for fastq files as input and one
+for bam files.
+
+ =================================   ======================================================
+ TEMPLATE                            Path to the template defining the pipeline steps
+                                     
+                                     For FASTQ files as input:
+                                     ${buildout:directory}/src/pipeline/template.bam.txt
+                                     
+                                     For BAM files as input:
+                                     ${buildout:directory}/src/pipeline/template3.0.txt
+ =================================   ======================================================
+
+There are some technical settings that need to be made so that the results are written
+to the right databases.
+
+ =================================   ======================================================
+ DB                                  Statistic results database name
+ COMMONDB                            Meta data Database name
+ HOST                                MySQL database host name
+ CLUSTER                             Name of the cluster node to use
+ =================================   ======================================================
+
+You can fine-tune the number of threads and the amount of memory to use for the Flux.
+
+ =================================   ======================================================
+ THREADS                             Number of threads to use
+ FLUXMEM                             Configures the memory used by the Flux. The default
+                                     value is 16G
+ =================================   ======================================================
+
+The mapper and the number of mismatches can be set.
+
+ =================================   ======================================================
+ MAPPER                              This currently has to be set to the value `GEM`
+ MISMATCHES                          Number of mismatches for the mapper
+ =================================   ======================================================
+
+The genome and annotation files need to be specified.
+
+ =================================   ======================================================
+ GENOMESEQ                           Genome file
+ ANNOTATION                          Annotation file
+ =================================   ======================================================
+
+Preprocessing the reads should be done on the fly. The most common preprocessing step
+is trimming, so there is one setting for the trim length. You can also specify your
+own preprocessing script.
+
+ =================================   ======================================================
+ PREPROCESS_TRIM_LENGTH              A preprocessing step that trims the reads by the given
+                                     nucleotide length
+ PREPROCESS                          Path to a custom script used for preprocessing each
+                                     of the read files before anything else
+ =================================   ======================================================
+
+You can customize the way the recursive mapping is done, as well as how the postprocessing
+is done on some files.
+
+ =================================   ======================================================
+ MIN_RECURSIVE_MAPPING_TRIM_LENGTH   Tunes the minimum length to which a read will be
+                                     trimmed during the recursive mapping.
+ MAXINTRONLENGTH                     Sets the maximum length of splits allowed during the 
+                                     postprocessing of the files generated by gem-2-sam 
+                                     removing the noise. 
+                                     
+                                     The default is set to 50k, which is reasonable in 
+                                     mammals, however different species may require 
+                                     different settings. Setting it to 0 will remove this
+                                     filter.
+ =================================   ======================================================
 
 
 Example Profile Configuration
