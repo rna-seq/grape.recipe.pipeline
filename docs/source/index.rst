@@ -179,7 +179,7 @@ This is the content of the db.cfg file::
 Profiles Configuration Parameters
 ---------------------------------
 
-The following parameters are configured in the `profiles` folder, and specify the
+The following parameters are configured in the ``profiles`` folder, and specify the
 general parameters of the Grape pipeline.
 
 The project id should be as short as possible.
