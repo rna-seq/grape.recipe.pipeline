@@ -195,10 +195,10 @@ for bam files.
     ``TEMPLATE``                        Path to the template defining the pipeline steps
                                         
                                         For ``FASTQ`` files as input:
-                                        ${buildout:directory}/src/pipeline/template.bam.txt
+                                        ${buildout:directory}/src/pipeline/template3.0.txt
                                      
                                         For ``BAM`` files as input:
-                                        ${buildout:directory}/src/pipeline/template3.0.txt
+                                        ${buildout:directory}/src/pipeline/template.bam.txt
     =================================   ======================================================
 
 There are some technical settings that need to be made so that the results are written
