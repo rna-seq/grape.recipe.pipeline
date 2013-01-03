@@ -11,7 +11,7 @@ from grape.recipe.pipeline.prepare import main
 from grape.recipe.pipeline.prepare import get_pipeline_script_command
 from grape.recipe.pipeline.prepare import CUFFLINKS_BINARIES
 from grape.recipe.pipeline.prepare import check_read_labels
-from grape.recipe.pipeline.prepare import parse_trim_length
+from grape.recipe.pipeline.prepare import parse_integer
 from grape.recipe.pipeline.prepare import parse_flux_mem
 
 
@@ -51,7 +51,7 @@ BUILDOUT['pipeline'] = {'TEMPLATE': TEMPLATE,
                         'MISMATCHES': '2',
                         'GENOMESEQ': GENOME,
                         'ANNOTATION': ANNOTATION,
-                        'MAXINTRONLENGTH': 50000,
+                        'MAXINTRONLENGTH': '50000',
                         'CLUSTER': 'mem_6',
                         'HOST': 'pou',
                         'PREPROCESS': '${buildout:directory}/scripts/pre.pl',
@@ -66,56 +66,32 @@ BUILDOUT['settings'] = {'java': '',
                         'overlap': os.path.join(PATH, 'src/overlap/overlap'),
                         'gem_folder': os.path.join(PATH, 'src/gem'),
                         }
-SCRIPT = ["#!/bin/bash\nbin/start_RNAseq_pipeline.3.0.pl",
-          "-species",
-          "'Homo",
-          "sapiens'",
-          "-genome",
-          "/src/testdata/H.sapiens.genome.hg19.test.fa",
-          "-annotation",
-          "/src/testdata/H.sapiens.EnsEMBL.55.test.gtf",
-          "-project",
-          "Test",
-          "-experiment",
-          "TestRun",
-          "-template",
-          "/src/pipeline/TEMPLATE3.0.txt",
-          "-readlength",
-          "76",
-          "-cellline",
-          "'NHEK'",
-          "-rnafrac",
-          "LONGPOLYA",
-          "-compartment",
-          "CELL",
-          "-bioreplicate",
-          "1",
-          "-threads",
-          "2",
-          "-qualities",
-          "solexa",
-          "-cluster",
-          "mem_6",
-          "-database",
-          "TestRNAseqPipeline",
-          "-commondb",
-          "TestRNAseqPipelineCommon",
-          "-host",
-          "pou",
-          "-mapper",
-          "GEM",
-          "-mismatches",
-          "2",
-          "-maxintronlength",
-          "50000",
-          "-preprocess",
-          "'${buildout:directory}/scripts/pre.pl'",
-          "-preprocess_trim_length",
-          "24",
-          "-trimlength",
-          "20",
-          "-fluxmem",
-          "16G"]
+
+SCRIPT = ['#!/bin/bash\nbin/start_RNAseq_pipeline.3.0.pl',
+          '-species', "'Homo", "sapiens'",
+          '-genome', '/src/testdata/H.sapiens.genome.hg19.test.fa',
+          '-annotation', '/src/testdata/H.sapiens.EnsEMBL.55.test.gtf',
+          '-project', 'Test',
+          '-experiment', 'TestRun',
+          '-template', '/src/pipeline/TEMPLATE3.0.txt',
+          '-cellline', "'NHEK'",
+          '-rnafrac', 'LONGPOLYA',
+          '-compartment', 'CELL',
+          '-qualities', 'solexa',
+          '-cluster', 'mem_6',
+          '-database', 'TestRNAseqPipeline',
+          '-commondb', 'TestRNAseqPipelineCommon',
+          '-host', 'pou',
+          '-mapper', 'GEM',
+          '-preprocess', "'${buildout:directory}/scripts/pre.pl'",
+          '-readlength', '76',
+          '-fluxmem', '16G',
+          '-bioreplicate', '1',
+          '-threads', '2',
+          '-mismatches', '2',
+          '-preprocess_trim_length', '24',
+          '-trimlength', '20',
+          '-maxintronlength', '50000']
 
 
 class MainTests(unittest.TestCase):
@@ -222,7 +198,7 @@ class PipelineScriptTests(unittest.TestCase):
         pipeline = BUILDOUT['pipeline'].copy()
         pipeline['HOST'] = 'dummyhost'
         pipeline['PREPROCESS'] = 'dummypreprocess'
-        pipeline['PREPROCESS_TRIM_LENGTH'] = 'dummytrimlength'
+        pipeline['PREPROCESS_TRIM_LENGTH'] = '1'
         options = OPTIONS.copy()
         options['experiment_id'] = os.path.split(options['location'])[-1]
         options['description'] = 'dummydescription'
@@ -231,7 +207,7 @@ class PipelineScriptTests(unittest.TestCase):
         self.failUnless(" -host dummyhost " in command)
         self.failUnless(" -run_description 'dummydescription' " in command)
         self.failUnless(" -preprocess 'dummypreprocess' " in command)
-        self.failUnless(" -preprocess_trim_length dummytrimlength" in command)
+        self.failUnless(" -preprocess_trim_length 1" in command)
 
     def test_empty_cluster(self):
         """
@@ -344,26 +320,45 @@ class ReadLabelsTests(unittest.TestCase):
                'label': ''}
         self.assertRaises(AttributeError, check_read_labels, acc, 'dummy')
 
-    def test_parse_trim_length(self):
+    def test_parse_integer_1(self):
         """
-        Test parsing of the trim length works for integers.
+        Test parsing of integers.
         """
-        pipeline = {'MIN_RECURSIVE_MAPPING_TRIM_LENGTH': '40'}
-        self.failUnless(parse_trim_length(pipeline) == '40')
+        self.failUnless(parse_integer('40') == '40')
 
-    def test_parse_flux_mem(self):
+    def test_parse_integer_2(self):
         """
-        Test that an integer value for fluxmem works
+        Test parsing of integers when empty string.
         """
-        pipeline = {'FLUXMEM': '16'}
-        self.failUnless(parse_flux_mem(pipeline) == '16')
+        self.failUnlessRaises(AttributeError, parse_integer, '')
 
-    def test_parse_flux_mem_gigabyte(self):
+    def test_parse_flux_mem_1(self):
         """
         Test that a number plus G works, like 16G returns 16.
         """
-        pipeline = {'FLUXMEM': '16'}
-        self.failUnless(parse_flux_mem(pipeline) == '16')
+        value = '16G'
+        self.failUnless(parse_flux_mem(value) == '16')
+
+    def test_parse_flux_mem_2(self):
+        """
+        Test that a number works
+        """
+        value = '16'
+        self.failUnless(parse_flux_mem(value) == '16')
+
+    def test_parse_flux_mem_3(self):
+        """
+        Test that an empty string fails
+        """
+        value = ''
+        self.failUnlessRaises(AttributeError, parse_flux_mem, value)
+
+    def test_parse_flux_mem_4(self):
+        """
+        Test that a string that is not an integer does not work
+        """
+        value = 'o897'
+        self.failUnlessRaises(AttributeError, parse_flux_mem, value)
 
 
 def test_suite():

@@ -295,7 +295,9 @@ def check_attribute(attribute, accession, number_of_reads):
 
 
 def readlist_labels(file_location, labels):
-    """Validate the filename and"""
+    """
+    Validate the filename. 
+    If it is a fastq file it needs to be gzipped."""
     file_name = os.path.split(file_location.strip())[1]
     if file_name.split('.')[-1] == "bam":
         pass
@@ -408,7 +410,7 @@ def install_dependency_fastqc(buildout, bin_folder):
         raise AttributeError("Fastqc binary not found: %s" % target)
 
 
-def parse_read_length(accession):
+def parse_read_length(value):
     """
     Given a readType, parse the read length
 
@@ -418,43 +420,33 @@ def parse_read_length(accession):
     2x96, 2x53, 2x76, 2x46, 2x35, 2x34, 100, 2x40, 2x50, 2x51
     2x54, 2x49, 2x36, 1x36, 2x37, 50, 75
     """
-    read_length = accession['readType']
-    if 'D' in read_length:
-        read_length = read_length.split('D')[0]
-    if 'x' in read_length:
+    if 'D' in value:
+        value = value.split('D')[0]
+    if 'x' in value:
         # Extract the read length taking the value after the x
-        read_length = read_length.split('x')[1]
-    if read_length.isdigit():
-        return read_length
-    else:
-        return None
+        value = value.split('x')[1]
+    return parse_integer(value)
 
 
-def parse_trim_length(pipeline):
-    """
-    Given a trim length, make sure it is an integer.
-    """
-    trim_length = pipeline.get('MIN_RECURSIVE_MAPPING_TRIM_LENGTH', '')
-    if trim_length.isdigit():
-        return trim_length
-    else:
-        return None
-
-
-def parse_flux_mem(pipeline):
+def parse_flux_mem(value):
     """
     Given a flux mem parameter, make sure it is an integer.
     If it ends with G (G for giga bytes), accept the integer before,
     and strip the G.
+    Given an attribute, make sure it is an integer.
     """
-    flux_mem = pipeline.get('FLUXMEM', '')
-    if flux_mem.endswith('G'):
-        flux_mem = flux_mem[:-1]
-    if flux_mem.isdigit():
-        return flux_mem
-    else:
-        return None
+    if value.endswith('G'):
+        value = value[:-1]
+    return parse_integer(value)
 
+def parse_integer(value):
+    """
+    Given an attribute, make sure it is an integer.
+    """
+    if value.isdigit():
+        return value
+    else:
+        raise AttributeError("%s error: %s" % (value, value))
 
 def get_pipeline_script_command(accession, pipeline, options):
     """
@@ -468,15 +460,9 @@ def get_pipeline_script_command(accession, pipeline, options):
     command += " -project %s" % pipeline['PROJECTID']
     command += " -experiment %s" % options['experiment_id']
     command += " -template %s" % pipeline['TEMPLATE']
-    read_length = parse_read_length(accession)
-    if not read_length is None:
-        command += " -readlength %s" % read_length
     command += " -cellline '%s'" % accession['cell']
     command += " -rnafrac %s" % accession['rnaExtract']
     command += " -compartment %s" % accession['localization']
-    if 'replicate' in accession:
-        command += " -bioreplicate %s" % accession['replicate']
-    command += " -threads %s" % pipeline['THREADS']
     command += " -qualities %s" % accession['qualities']
     if 'CLUSTER' in pipeline:
         if str(pipeline['CLUSTER']).strip() == '':
@@ -488,22 +474,42 @@ def get_pipeline_script_command(accession, pipeline, options):
     if 'HOST' in pipeline:
         command += " -host %s" % pipeline['HOST']
     command += " -mapper %s" % pipeline['MAPPER']
-    command += " -mismatches %s" % pipeline['MISMATCHES']
-    if 'MAXINTRONLENGTH' in pipeline:
-        command += " -maxintronlength %s" % pipeline['MAXINTRONLENGTH']
     if 'description' in options:
         command += " -run_description '%s'" % options['description']
     if 'PREPROCESS' in pipeline:
         command += " -preprocess '%s'" % pipeline['PREPROCESS']
-    if 'PREPROCESS_TRIM_LENGTH' in pipeline:
-        template = " -preprocess_trim_length %s"
-        command += template % pipeline['PREPROCESS_TRIM_LENGTH']
-    trim_length = parse_trim_length(pipeline)
-    if not trim_length is None:
-        command += " -trimlength %s" % trim_length
-    flux_mem = parse_flux_mem(pipeline)
-    if not flux_mem is None:
-        command += " -fluxmem %sG" % flux_mem
+    key = 'readType'
+    if key in accession:
+        value = parse_read_length(accession[key])
+        command += " -readlength %s" % value
+    key = 'FLUXMEM'
+    if key in pipeline:
+        value = parse_flux_mem(pipeline[key])
+        command += " -fluxmem %sG" % value
+    key = 'replicate'
+    if key in accession:
+        value = parse_integer(accession[key])
+        command += " -bioreplicate %s" % value
+    key = 'THREADS'
+    if key in pipeline:
+        value = parse_integer(pipeline[key])        
+        command += " -threads %s" % pipeline['THREADS']
+    key = 'MISMATCHES'
+    if key in pipeline:
+        value = parse_integer(pipeline[key])
+        command += " -mismatches %s" % value
+    key = 'PREPROCESS_TRIM_LENGTH'
+    if key in pipeline:
+        value = parse_integer(pipeline[key])
+        command += " -preprocess_trim_length %s" % value
+    key = 'MIN_RECURSIVE_MAPPING_TRIM_LENGTH'
+    if key in pipeline:
+        value = parse_integer(pipeline[key])
+        command += " -trimlength %s" % value
+    key = 'MAXINTRONLENGTH'
+    if key in pipeline:
+        value = parse_integer(pipeline[key])
+        command += " -maxintronlength %s" % value
     return command
 
 
