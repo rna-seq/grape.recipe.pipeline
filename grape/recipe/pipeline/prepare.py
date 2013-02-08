@@ -239,6 +239,9 @@ def check_read_labels(accession, experiment_id):
             msg = "For unpaired, mate id and pair id have to be the same: %s."
             raise AttributeError(msg % experiment_id)
     elif accession['paired'] == '1':
+        if accession['type'] == 'bam':
+            # No check for bam files
+            return
         # pair id there can not be more that two values that are the same
         # e.g. three testA
         # For paired there are always 2 values that must be the same
@@ -296,7 +299,7 @@ def check_attribute(attribute, accession, number_of_reads):
 
 def readlist_labels(file_location, labels):
     """
-    Validate the filename. 
+    Validate the filename.
     If it is a fastq file it needs to be gzipped."""
     file_name = os.path.split(file_location.strip())[1]
     if file_name.split('.')[-1] == "bam":
@@ -439,6 +442,7 @@ def parse_flux_mem(value):
         value = value[:-1]
     return parse_integer(value)
 
+
 def parse_integer(value):
     """
     Given an attribute, make sure it is an integer.
@@ -447,6 +451,7 @@ def parse_integer(value):
         return value
     else:
         raise AttributeError("%s error: %s" % (value, value))
+
 
 def get_pipeline_script_command(accession, pipeline, options):
     """
@@ -492,7 +497,7 @@ def get_pipeline_script_command(accession, pipeline, options):
         command += " -bioreplicate %s" % value
     key = 'THREADS'
     if key in pipeline:
-        value = parse_integer(pipeline[key])        
+        value = parse_integer(pipeline[key])
         command += " -threads %s" % pipeline['THREADS']
     key = 'MISMATCHES'
     if key in pipeline:

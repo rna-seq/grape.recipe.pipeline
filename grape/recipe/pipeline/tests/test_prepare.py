@@ -267,7 +267,8 @@ class ReadLabelsTests(unittest.TestCase):
         accession = {'paired': '1',
                      'pair_id': '1\n1',
                      'mate_id': '',
-                     'label': ''}
+                     'label': '',
+                     'type': ''}
         check_read_labels(accession, 'dummy')
 
     def test_wrong_paired_dummy(self):
@@ -306,7 +307,11 @@ class ReadLabelsTests(unittest.TestCase):
         Test the check_read_labels method where the pairs are not paired.
         Try two lines.
         """
-        acc = {'paired': '1', 'pair_id': '1\n2', 'mate_id': '', 'label': ''}
+        acc = {'paired': '1',
+               'pair_id': '1\n2',
+               'mate_id': '',
+               'label': '',
+               'type': ''}
         self.assertRaises(AttributeError, check_read_labels, acc, 'dummy')
 
     def test_paired_where_pairs_not_paired_with_4(self):
@@ -317,7 +322,8 @@ class ReadLabelsTests(unittest.TestCase):
         acc = {'paired': '1',
                'pair_id': '1\n2\n3\n4',
                'mate_id': '',
-               'label': ''}
+               'label': '',
+               'type': ''}
         self.assertRaises(AttributeError, check_read_labels, acc, 'dummy')
 
     def test_parse_integer_1(self):
