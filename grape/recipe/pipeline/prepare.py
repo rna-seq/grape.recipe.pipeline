@@ -538,26 +538,22 @@ def install_pipeline_scripts(options, buildout, accession):
             raise AttributeError
 
     buildout_directory = buildout['buildout']['directory']
-
+    bam = os.path.join(buildout_directory, 'src/pipeline/template.bam.txt')
+    fastq = os.path.join(buildout_directory, 'src/pipeline/template3.0.txt')
     if 'TEMPLATE' in pipeline:
         if accession['type'] == 'fastq':
-            template = os.path.join(buildout_directory, 'src/pipeline/template.bam.txt')
-            if template == pipeline['TEMPLATE']:
-                raise AttributError("Wrong TEMPLATE for fastq: %s" % template)
+            if bam == pipeline['TEMPLATE']:
+                raise AttributeError("Wrong TEMPLATE for fastq: %s" % bam)
         elif accession['type'] == 'bam':
-            template = os.path.join(buildout_directory, 'src/pipeline/template3.0.txt')
-            if template == pipeline['TEMPLATE']:
-                raise AttributError("Wrong TEMPLATE for bam: %s" % template)
+            if fastq == pipeline['TEMPLATE']:
+                raise AttributeError("Wrong TEMPLATE for bam: %s" % fastq)
         else:
-            raise AttributeError("Undefined TEMPLATE parameter")        
+            raise AttributeError("Undefined TEMPLATE parameter")
     else:
-        buildout_directory = buildout['buildout']['directory']
         if accession['type'] == 'fastq':
-            template = os.path.join(buildout_directory, 'src/pipeline/template3.0.txt')
-            pipeline['TEMPLATE'] = template
+            pipeline['TEMPLATE'] = fastq
         elif accession['type'] == 'bam':
-            template = os.path.join(buildout_directory, 'src/pipeline/template.bam.txt')
-            pipeline['TEMPLATE'] = template
+            pipeline['TEMPLATE'] = bam
         else:
             raise AttributeError("Undefined TEMPLATE parameter")
 
