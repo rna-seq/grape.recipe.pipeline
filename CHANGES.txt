@@ -1,3 +1,10 @@
+1.1.15 (2013-02-13)
+===================
+
+- Make TEMPLATE parameter optional
+
+- Detect wrong template for fastq and bam files
+
 1.1.14 (2013-02-08)
 ===================
 
