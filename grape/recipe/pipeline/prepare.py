@@ -537,6 +537,30 @@ def install_pipeline_scripts(options, buildout, accession):
             # The advertised pipeline configuration is not there
             raise AttributeError
 
+    buildout_directory = buildout['buildout']['directory']
+
+    if 'TEMPLATE' in pipeline:
+        if accession['type'] == 'fastq':
+            template = os.path.join(buildout_directory, 'src/pipeline/template.bam.txt')
+            if template == pipeline['TEMPLATE']:
+                raise AttributError("Wrong TEMPLATE for fastq: %s" % template)
+        elif accession['type'] == 'bam':
+            template = os.path.join(buildout_directory, 'src/pipeline/template3.0.txt')
+            if template == pipeline['TEMPLATE']:
+                raise AttributError("Wrong TEMPLATE for bam: %s" % template)
+        else:
+            raise AttributeError("Undefined TEMPLATE parameter")        
+    else:
+        buildout_directory = buildout['buildout']['directory']
+        if accession['type'] == 'fastq':
+            template = os.path.join(buildout_directory, 'src/pipeline/template3.0.txt')
+            pipeline['TEMPLATE'] = template
+        elif accession['type'] == 'bam':
+            template = os.path.join(buildout_directory, 'src/pipeline/template.bam.txt')
+            pipeline['TEMPLATE'] = template
+        else:
+            raise AttributeError("Undefined TEMPLATE parameter")
+
     command = get_pipeline_script_command(accession, pipeline, options)
 
     target = os.path.join(options['location'], 'start.sh')
