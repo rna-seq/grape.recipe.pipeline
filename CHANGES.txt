@@ -1,3 +1,9 @@
+1.1.16 (2013-10-21)
+===================
+
+- Make the error message more clear when an accession in accessions/myproject/db.cfg doesn't have a 'type'
+  parameter with either 'fastq' or 'bam'
+
 1.1.15 (2013-02-13)
 ===================
 

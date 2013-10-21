@@ -548,7 +548,7 @@ def install_pipeline_scripts(options, buildout, accession):
             if fastq == pipeline['TEMPLATE']:
                 raise AttributeError("Wrong TEMPLATE for bam: %s" % fastq)
         else:
-            raise AttributeError("Undefined TEMPLATE parameter")
+            raise AttributeError("Every accession in accessions/myproject/db.cfg needs to have a 'type' parameter with possible values of 'fastq' or 'bam'")
     else:
         if accession['type'] == 'fastq':
             pipeline['TEMPLATE'] = fastq
